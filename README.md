@@ -14,8 +14,7 @@ That's it! You don't need to do anything extra to your Twine- the multiplayer fe
 ## Features
 - **Multiplayer:** As previously mentioned, the main feature of Theyr is creating Multiplayer Twine stories. 
 - **Twine/Twee Hot Reloading:** While the Node server is running, saving an html file will automatically create a twee file and vice versa. So you can easily switch between working in Twine or in Twee.
-- **Automatic deployment to Heroku:** Theyr allows you to easily deploy your application to Heroku with a single command. All you need to do is input the required information into the config file and run `node createHerokuInstances` to deploy your app to Heroku.
-
+- **Automatic deployment to Heroku:** Theyr allows you to easily deploy your application to Heroku using a config file and a single command.
 
 ## What You'll Need to Get Started
 1. Install Twine at https://twinery.org/
@@ -63,6 +62,19 @@ git remote add heroku https://git.heroku.com/app-name-here.git
 ```
 git push heroku master
 ```
+
+## How To Use
+### Real-time Updating
+Theyr utilizes [live-update](https://github.com/cyrusfirheir/cycy-wrote-custom-macros/tree/master/live-update), a custom macro which allows a passage to be updated in real-time when a SugarCube variable is changed, without needing to reload the passage. 
+
+In order to see real-time changes to a passage when updates occur, place all contents of a passage between liveblock tags like this:
+```
+<liveblock>
+  Passage contents here...
+</liveblock>
+```
+
+### 
 
 ## Authors
 - [@Alex Lau](https://github.com/meetAlexLau)
