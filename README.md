@@ -21,7 +21,7 @@ That's it! You don't need to do anything extra to your Twine- the multiplayer fe
 2. Install Node at https://nodejs.org/en/
 3. Create a Heroku account at https://id.heroku.com/login
 
-## Instructions
+# Instructions
 ### Clone this Github Repository
 
 1. Clone this repository:
@@ -63,18 +63,33 @@ git remote add heroku https://git.heroku.com/app-name-here.git
 git push heroku master
 ```
 
-## How To Use
+# How To Use
+### Creating your Twine story
+All Twine related html/twee files should be placed in the Twine folder. If you plan to work in Twine, import template.html into Twine. If you plan to work in Twee, start working in the template.twee file. These template files contain code that is required for multiplayer functionality to work. Don't change or remove any of the existing code.
+
+Run `npm start` to run the server. When the server is running, saving an html file in the Twine folder will create an identical twee file and vice versa. 
+<br> <br>
+
 ### Real-time Updating
 Theyr utilizes [live-update](https://github.com/cyrusfirheir/cycy-wrote-custom-macros/tree/master/live-update), a custom macro which allows a passage to be updated in real-time when a SugarCube variable is changed, without needing to reload the passage. 
 
-In order to see real-time changes to a passage when updates occur, place all contents of a passage between liveblock tags like this:
+In order to see real-time changes to a passage when updates occur, place all contents of a passage between <\<liveblock>\> tags like this:
 ```
-<liveblock>
+<<liveblock>>
   Passage contents here...
-</liveblock>
+<</liveblock>>
 ```
+Passage contents that aren't placed in <\<liveblock>\> tags will not display updates immediately. The passage will either have to be reloaded or revisted in order to observe changes.
 
-### 
+<b> Note: We recommend not using <\<textbox\>> tags within <\<liveblock>\>, as it seems to be buggy. </b>
+<br> <br>
+### Playing your app
+First, ensure that the server is running through `npm start`. Once the server is running, you can view your application by opening http://localhost:53134. 
+
+### Easy Deploy to Heroku
+
+
+
 
 ## Authors
 - [@Alex Lau](https://github.com/meetAlexLau)
