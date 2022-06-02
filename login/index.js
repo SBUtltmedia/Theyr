@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 import path from 'path'
 import fs from 'fs'
 import webstack from '../Webstack.js'
@@ -6,15 +5,15 @@ import '../tweeGaze.js'
 import { fileURLToPath } from 'url';
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const configArray = require('./config.json')
-const { clientId, clientSecret, twinePath, port } = configArray[0];
+const configObj = require('./config.json');
+const appIndex = process.env.appIndex;
+const { clientId, clientSecret, twinePath, port } = configObj.channelconf[appIndex];
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const PORT = process.env.PORT || port
 const { app } = new webstack(PORT).get();
-
 const htmlTemplate = 'login/index.html';
 const TWINE_PATH = 'Twine/demo.html';
 
