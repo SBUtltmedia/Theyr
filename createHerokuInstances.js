@@ -30,8 +30,8 @@ for (let i = 1; i <= herokuInstances; i++) {
     // Add custom config variables
     let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com/`).replace(/&/g, '"&"')}&response_type=code&scope=identify%20guilds.members.read%20guilds`;
     configVars['redirectURL'] = redirectURL;
-    configVars['herokuURL'] =  `https://${app}-${i}.herokuapp.com`;
-    configVars['appIndex'] =  i;
+    configVars['herokuURL'] = `https://${app}-${i}.herokuapp.com`;
+    configVars['appIndex'] = i;
 
     // Set config variables on Heroku
     for (let key of Object.keys(configVars)) {
@@ -42,6 +42,7 @@ for (let i = 1; i <= herokuInstances; i++) {
     // Execute commands
     for (let command of commands) {
         try {
+            // console.log(command);
             execSync(command, console.log);
         } catch(err) {}
     }

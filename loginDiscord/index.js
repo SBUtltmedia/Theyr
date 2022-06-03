@@ -30,15 +30,6 @@ const REDIRECTURL = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT
 const { app } = new webstack(PORT).get();
 const htmlTemplate = './views/index.html'
 
-function returnTwine(userData, response) {
-	let userDataScriptTag =  `
-	<script> let userData=${userData} </script>
-	`
-	let file = TWINE_PATH
-	let fileContents = fs.readFileSync(file)
-	return response.send(`${fileContents} ${userDataScriptTag}`);
-}
-
 // Listen for requests to the homepage
 app.get('/', async ({ query }, response) => {
 	// console.log({query});
@@ -110,6 +101,15 @@ app.get('/', async ({ query }, response) => {
 	}
 	loadHome(response);
 });
+
+function returnTwine(userData, response) {
+	let userDataScriptTag =  `
+	<script> let userData=${userData} </script>
+	`
+	let file = TWINE_PATH
+	let fileContents = fs.readFileSync(file)
+	return response.send(`${fileContents} ${userDataScriptTag}`);
+}
 
 function loadHome(response) {
 	let htmlContents = fs.readFileSync(htmlTemplate, 'utf8')
