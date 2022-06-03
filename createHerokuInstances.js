@@ -1,3 +1,5 @@
+// NOTE: This file only pushes files to Heroku that have already been committed. Uncommitted changes won't be pushed to Heroku.
+
 import { execSync } from 'child_process';
 import { createRequire } from "module";
 import { exit } from 'process';

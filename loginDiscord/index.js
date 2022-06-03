@@ -5,18 +5,18 @@ import webstack from '../Webstack.js';
 import '../tweeGaze.js';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
-import { exit } from 'process';
 const require = createRequire(import.meta.url);
-
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
 let config_path = 'config.json'
 
-const confObj = require('./' + config_path);
-const { clientId, clientSecret, guildId } = confObj.channelconf[0];	// Indexed at 0 b/c when running locally we'll just use the first element as our test
-const { twinePath, port } = confObj.serverconf;
+// Check if directory exists b/c it won't be available on Heroku (will use ENV variables instead)
+if (fs.existsSync(__dirname + "/" + config_path)) {
+	const confObj = require('./' + config_path);
+	var { clientId, clientSecret, guildId } = confObj.channelconf[0];	// Indexed at 0 b/c when running locally we'll just use the first element as our test
+	var { twinePath, port } = confObj.serverconf;
+}
 
 // Gets environment variables from Heroku. Otherwise, get them locally from the config file.
 const CLIENT_ID = process.env.clientId || clientId;
