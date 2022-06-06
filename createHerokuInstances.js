@@ -26,12 +26,17 @@ for (let i = 1; i <= herokuInstances; i++) {
         `heroku create -a ${app}-${i} --buildpack heroku/nodejs`, 
         `heroku buildpacks:add -a ${app}-${i} heroku-community/multi-procfile`,
         `heroku config:set -a ${app}-${i} PROCFILE=Procfile`, 
+        `git add .`,
+        `git commit -m "Automated update to Heroku/Github"`,
         `git push https://git.heroku.com/${app}-${i}.git HEAD:master`
     ]
     
     // Add custom config variables
+    // "https://discord.com/api/oauth2/authorize?client_id=973930115820052490&redirect_uri=https%3A%2F%2Faztec-1.herokuapp.com&response_type=code&scope=identify%20guilds%20guilds.members.read"
+    // "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdistest-1.herokuapp.com%2F&response_type=code&scope=identify%20guilds.members.read%20guilds"
     
-    let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com/`)}&response_type=code&scope=identify%20guilds.members.read%20guilds`.replace(/&/g, '"&"');
+    let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com/`)}&response_type=code&scope=identify&guilds.members.read&guilds`.replace(/&/g, '"&"');
+    console.log({redirectURL});
     configVars['redirectURL'] = redirectURL;
     configVars['herokuURL'] = `https://${app}-${i}.herokuapp.com`;
     configVars['appIndex'] = i;
@@ -45,8 +50,8 @@ for (let i = 1; i <= herokuInstances; i++) {
     // Execute commands
     for (let command of commands) {
         try {
-            // console.log(command);
-            execSync(command, console.log);
+            console.log(command);
+            // execSync(command, console.log);
         } catch(err) {}
     }
 }
