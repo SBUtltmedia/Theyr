@@ -35,7 +35,7 @@ for (let i = 1; i <= herokuInstances; i++) {
     // "https://discord.com/api/oauth2/authorize?client_id=973930115820052490&redirect_uri=https%3A%2F%2Faztec-1.herokuapp.com&response_type=code&scope=identify%20guilds%20guilds.members.read"
     // "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdistest-1.herokuapp.com%2F&response_type=code&scope=identify%20guilds.members.read%20guilds"
     
-    let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com/`)}&response_type=code&scope=identify%20guilds.members.read%20guilds`.replace(/&/g, '"&"');
+    let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com`)}&response_type=code&scope=identify%20guilds.members.read%20guilds`.replace(/&/g, '"&"');
     console.log({redirectURL});
     configVars['redirectURL'] = redirectURL;
     configVars['herokuURL'] = `https://${app}-${i}.herokuapp.com`;
@@ -57,4 +57,4 @@ for (let i = 1; i <= herokuInstances; i++) {
 }
 
 // "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdisctest-1.herokuapp.com&response_type=code&scope=identify%20guilds%20guilds.members.read"
-// "https://discord.com/api/oauth2/authorize?client_id=964554781169451098"&"redirect_uri=https%3A%2F%2Fdisctest-2.herokuapp.com%2F"&"response_type=code"&"scope=identify"&"guilds.members.read"&"guilds"
+// "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdisctest-1.herokuapp.com&response_type=code&scope=identify%20guilds.members.read%20guilds"
