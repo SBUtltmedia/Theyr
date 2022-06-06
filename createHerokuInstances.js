@@ -18,8 +18,8 @@ let herokuInstances = configObj.channelconf.length;
 // Loop through instances given in config JSON file and push them all to Heroku
 for (let i = 1; i <= herokuInstances; i++) {
     let clientId = configObj.channelconf[i-1].clientId;
-    let configVars = configObj.channelconf[i-1];
-    
+    let configVars = {...configObj.channelconf[i-1], ...configObj.serverconf};  // Combine channelconf and serverconf
+
     // Commands: Destroy current app -> Create new app -> Set buildpack to node -> Set Procfile -> Push to Heroku
     let commands = [
         `heroku apps:destroy -a ${app}-${i} --confirm ${app}-${i}`,
@@ -45,8 +45,8 @@ for (let i = 1; i <= herokuInstances; i++) {
     // Execute commands
     for (let command of commands) {
         try {
-            console.log(command);
-            // execSync(command, console.log);
+            // console.log(command);
+            execSync(command, console.log);
         } catch(err) {}
     }
 }
