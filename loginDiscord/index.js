@@ -78,7 +78,7 @@ const TWINE_PATH = process.env.twinePath || twinePath;
 const PORT = process.env.PORT || port;
 const HEROKU_URL = process.env.herokuURL || `http://localhost:${PORT}`;
 const GUILD_ID = process.env.guildId || guildId;
-const REDIRECTURL = process.env.redirectURL || `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(HEROKU_URL)}&response_type=code&scope=identify%20guilds.members.read%20guilds`;
+const REDIRECTURL = process.env.redirectURL || `https://discord.com/api/oauth2/authorize?response_type=code"&"scope=identify"&"guilds.members.read"&"guilds"&"client_id=${CLIENT_ID}"&"redirect_uri=${encodeURIComponent(HEROKU_URL)}`;
 
 const { app } = new webstack(PORT).get();
 const htmlTemplate = './views/index.html'
