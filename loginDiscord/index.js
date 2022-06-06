@@ -8,55 +8,55 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 // ** DISCORD JS **
-const { Client, Intents } = require('discord.js');
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+// const { Client, Intents } = require('discord.js');
+// const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+// const { REST } = require('@discordjs/rest');
+// const { Routes } = require('discord-api-types/v9');
 
-const DISC_CLIENT_ID = '983373819030945812'
-const DISC_GUILD_ID = '968922771692339291'
-const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.GEJeeD.38ICQXAaS49mWm3UPDNDcpmq67Wvt-gFDXr9ZE"
+// const DISC_CLIENT_ID = '983373819030945812'
+// const DISC_GUILD_ID = '968922771692339291'
+// const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.GEJeeD.38ICQXAaS49mWm3UPDNDcpmq67Wvt-gFDXr9ZE"
 
-const commands = [{
-  name: 'ping',
-  description: 'Replies with Pong!'
-}, {
-    name: 'pog',
-    description: 'Replies with Pog!'
-}]; 
+// const commands = [{
+//   name: 'ping',
+//   description: 'Replies with Pong!'
+// }, {
+//     name: 'pog',
+//     description: 'Replies with Pog!'
+// }]; 
 
-const rest = new REST({ version: '9' }).setToken(TOKEN);
+// const rest = new REST({ version: '9' }).setToken(TOKEN);
 
-(async () => {
-	try {
-	  console.log('Started refreshing application (/) commands.');
+// (async () => {
+// 	try {
+// 	  console.log('Started refreshing application (/) commands.');
   
-	  await rest.put(
-		Routes.applicationGuildCommands(DISC_CLIENT_ID, DISC_GUILD_ID),
-		{ body: commands },
-	  );
+// 	  await rest.put(
+// 		Routes.applicationGuildCommands(DISC_CLIENT_ID, DISC_GUILD_ID),
+// 		{ body: commands },
+// 	  );
   
-	  console.log('Successfully reloaded application (/) commands.');
-	} catch (error) {
-	  console.error(error);
-	}
-})();
+// 	  console.log('Successfully reloaded application (/) commands.');
+// 	} catch (error) {
+// 	  console.error(error);
+// 	}
+// })();
   
-client.once('ready', () => {
-	console.log(`Logged in as ${client.user.tag}`)
-})
+// client.once('ready', () => {
+// 	console.log(`Logged in as ${client.user.tag}`)
+// })
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
+// client.on('interactionCreate', async interaction => {
+//     if (!interaction.isCommand()) return;
   
-    if (interaction.commandName === 'ping') {
-      await interaction.reply('Pong!');
-    }
+//     if (interaction.commandName === 'ping') {
+//       await interaction.reply('Pong!');
+//     }
 
-});
+// });
 
-client.login(TOKEN);
+// client.login(TOKEN);
 
 // ** END OF DISCORD JS **
 
