@@ -50,8 +50,8 @@ for (let i = 1; i <= herokuInstances; i++) {
     // Execute commands
     for (let command of commands) {
         try {
-            console.log(command);
-            // execSync(command, console.log);
+            // console.log(command);
+            execSync(command, console.log);
         } catch(err) {}
     }
 }
