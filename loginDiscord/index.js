@@ -5,59 +5,15 @@ import webstack from '../Webstack.js';
 import '../tweeGaze.js';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
+import DiscordBot from '../discordBot.js';
 const require = createRequire(import.meta.url);
 
 // ** DISCORD JS **
-// const { Client, Intents } = require('discord.js');
-// const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const DISC_CLIENT_ID = '983373819030945812'
+const DISC_GUILD_ID = '968922771692339291'
+const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.G_yaYY.N5iMvwS1JCFGnBhWs2rmq1eKy7Ul0IOcj0E6ec"
 
-// const { REST } = require('@discordjs/rest');
-// const { Routes } = require('discord-api-types/v9');
-
-// const DISC_CLIENT_ID = '983373819030945812'
-// const DISC_GUILD_ID = '968922771692339291'
-// const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.GEJeeD.38ICQXAaS49mWm3UPDNDcpmq67Wvt-gFDXr9ZE"
-
-// const commands = [{
-//   name: 'ping',
-//   description: 'Replies with Pong!'
-// }, {
-//     name: 'pog',
-//     description: 'Replies with Pog!'
-// }]; 
-
-// const rest = new REST({ version: '9' }).setToken(TOKEN);
-
-// (async () => {
-// 	try {
-// 	  console.log('Started refreshing application (/) commands.');
-  
-// 	  await rest.put(
-// 		Routes.applicationGuildCommands(DISC_CLIENT_ID, DISC_GUILD_ID),
-// 		{ body: commands },
-// 	  );
-  
-// 	  console.log('Successfully reloaded application (/) commands.');
-// 	} catch (error) {
-// 	  console.error(error);
-// 	}
-// })();
-  
-// client.once('ready', () => {
-// 	console.log(`Logged in as ${client.user.tag}`)
-// })
-
-// client.on('interactionCreate', async interaction => {
-//     if (!interaction.isCommand()) return;
-  
-//     if (interaction.commandName === 'ping') {
-//       await interaction.reply('Pong!');
-//     }
-
-// });
-
-// client.login(TOKEN);
-
+let discordBot = new DiscordBot(DISC_CLIENT_ID, DISC_GUILD_ID, TOKEN)
 // ** END OF DISCORD JS **
 
 const __filename = fileURLToPath(import.meta.url)
@@ -78,7 +34,7 @@ const TWINE_PATH = process.env.twinePath || twinePath;
 const PORT = process.env.PORT || port;
 const HEROKU_URL = process.env.herokuURL || `http://localhost:${PORT}`;
 const GUILD_ID = process.env.guildId || guildId;
-const REDIRECTURL = process.env.redirectURL || `https://discord.com/api/oauth2/authorize?response_type=code"&"scope=identify"&"guilds.members.read"&"guilds"&"client_id=${CLIENT_ID}"&"redirect_uri=${encodeURIComponent(HEROKU_URL)}`;
+const REDIRECTURL = process.env.redirectURL || `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(HEROKU_URL)}&response_type=code&scope=identify%20guilds.members.read%20guilds`;
 
 const { app } = new webstack(PORT).get();
 const htmlTemplate = './views/index.html'
