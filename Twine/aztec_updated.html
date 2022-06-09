@@ -172,7 +172,21 @@ importScripts([
 			}
 		}
 	});
+
+	Macro.add(['discord'], {
+		tags: null,
+		handler: function handler() {
+			try {
+				let message = this.payload[0].contents.trim();
+				let channel = this.payload[0].arguments;
+				$.get("/discordbot", {message, channel}, () => {});
+			} catch (e) {
+				return e;
+			}
+		}
+	});
 })();
+
 
 
 // Run when passage starts 
@@ -2460,6 +2474,9 @@ Vote is 2
 
 
 &lt;&lt;/theyr&gt;&gt;</tw-passagedata><tw-passagedata pid="93" name="The Library" tags="Done" position="521,25" size="100,100">&lt;&lt;theyr&gt;&gt;
+
+&lt;&lt;discord spanish&gt;&gt; Contents of discord tag &lt;&lt;/discord&gt;&gt;
+
 It&#39;s six weeks into the semester and you&#39;re already drowning in work. You have your first exams this week, you need to get started on some research, and now your history professor has sprung a surprise assignment on you at the last minute--and it&#39;s due tomorrow! The only way you&#39;re going to get everything done is to pull an all-nighter. There&#39;s no way you&#39;ll be able to stay awake at home; your bed is there and it&#39;s just too tempting. So you head to the library. &lt;br&gt;
 &lt;br&gt;
 It&#39;s 7 pm and the library is more crowded than usual. It looks like you&#39;re not the only one with a mountain of work to do this week! There&#39;s no way you&#39;ll be able to focus in the midst of so many people. Maybe the top floor is quieter. You head upstairs towards the study carrels, but they&#39;re all taken. It&#39;s dead quiet up here, but there&#39;s nowhere to work. You begin wandering down unfamiliar hallways, poking your head into all the different rooms, but none of them work. You&#39;re beginning to get frustrated when you notice a door you&#39;ve never seen before. It&#39;s tucked into an alcove in the very back corner of the building. You decide to check this one last spot before you give up and join the masses downstairs. &lt;br&gt;

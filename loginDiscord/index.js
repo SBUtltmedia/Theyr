@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 // ** DISCORD JS **
 const DISC_CLIENT_ID = '983373819030945812'
 const DISC_GUILD_ID = '968922771692339291'
-const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.G_yaYY.N5iMvwS1JCFGnBhWs2rmq1eKy7Ul0IOcj0E6ec"
+const TOKEN = "OTgzMzczODE5MDMwOTQ1ODEy.GnYxai.3TstaPNT11QVx0SY6y-u1mYQYxzNW9LwXgXmug"
 
 let discordBot = new DiscordBot(DISC_CLIENT_ID, DISC_GUILD_ID, TOKEN)
 // ** END OF DISCORD JS **
@@ -39,7 +39,12 @@ const REDIRECTURL = process.env.redirectURL || `https://discord.com/api/oauth2/a
 const { app } = new webstack(PORT).get();
 const htmlTemplate = './views/index.html'
 
-// Listen for requests to the homepage
+app.get('/discordbot', async ({ query }, response) => {
+	discordBot.sendNotif(query.channel, query.message)
+})
+
+
+	// Listen for requests to the homepage
 app.get('/', async ({ query }, response) => {
 	// console.log({query});
 	const { code, state, test, nick } = query;

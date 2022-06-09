@@ -5,6 +5,7 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
+var XMLHttpRequest = require('xhr2');
 
 class DiscordBot {
     constructor(clientId, guildId, token) {
@@ -58,8 +59,25 @@ class DiscordBot {
     }
 
     // Sends notification to a specific channel 
-    sendNotif() {
-        console.log("NOTIFICATION SENDING...");
+    sendNotif(channel, message) {
+        console.log({channel, message});
+        
+        const content = message;
+        const channelURL = "https://discord.com/api/webhooks/984149235006066690/DvDM2pyHeVPSOZl58rVy7KWS7aNh_ur6fNB0XEg3gMYJwKWncCT1LLPQE3Cr_D2nFJnA";
+        const username = 'Spanish Messenger';
+        const avatar_url = "https://images.fineartamerica.com/images-medium-large/2-hernando-cortez-spanish-conquistador-photo-researchers.jpg";
+
+        const request = new XMLHttpRequest();
+        request.open("POST", channelURL)
+        request.setRequestHeader('Content-type', 'application/json');
+        const params = {
+            username,
+            avatar_url,
+            content
+        }
+
+        // Send message
+        request.send(JSON.stringify(params));
     }
 }
 
