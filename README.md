@@ -65,10 +65,7 @@ git push heroku master
 
 # How To Use
 ### Creating your Twine story
-All Twine related html/twee files should be placed in the Twine folder. If you plan to work in Twine, import template.html into Twine. If you plan to work in Twee, start working in the template.twee file. These template files contain code that is required for multiplayer functionality to work. Don't change or remove any of the existing code.
-
-Run `npm start` to run the server. When the server is running, saving an html file in the Twine folder will create an identical twee file and vice versa. 
-<br> <br>
+All Twine related html/twee files should be placed in the Twine folder. If you plan to work in Twine, import template.html into Twine. If you plan to work in Twee, start working in the template.twee file. These template files contain code that is required for multiplayer functionality to work. Don't change or remove any of the existing code in Story JavaScript, but feel free to add additional JavaScript code afterwards.
 
 ### Real-time Updating
 Theyr utilizes [live-update](https://github.com/cyrusfirheir/cycy-wrote-custom-macros/tree/master/live-update), a custom macro which allows a passage to be updated in real-time when a SugarCube variable is changed, without needing to reload the passage. 
@@ -79,15 +76,26 @@ In order to see real-time changes to a passage when updates occur, place all con
   Passage contents here...
 <</liveblock>>
 ```
-Passage contents that aren't placed in <\<liveblock>\> tags will not display updates immediately. The passage will either have to be reloaded or revisted in order to observe changes.
+Passage contents that aren't placed in <\<liveblock>\> tags will not display updates immediately. The Twine passage will either have to be reloaded or revisted in order to observe changes.
 
 <b> Note: We recommend not using <\<textbox\>> tags within <\<liveblock>\>, as it seems to be buggy. </b>
 <br> <br>
-### Playing your app
-First, ensure that the server is running through `npm start`. Once the server is running, you can view your application by opening http://localhost:53134. 
+
+### Playing your Twine story
+1. Open the config.json file
+2. Change the twinePath value to Twine/[your_story_here].html
+3. <b>(ONLY FOR DISCORD LOGIN)</b> Add the values for ClientId, ClientSecret and Guild ID (Server ID) from your Discord Application
+4. Run `npm start` to run the server. When the server is running, saving an html file in the Twine folder will create an identical twee file and vice versa. 
+5. Play your app by visiting http://localhost:53134/
+<br> <br>
 
 ### Easy Deploy to Heroku
+1. Make sure the config.json file is correctly filled out, as described in the previous steps
+2. Run `heroku login` to login to your Heroku account
+3. Run `node createHerokuInstances.js [appname]`. This will deploy a Heroku application with the given app name.
+4. Visit the Heroku application by going to your Heroku dashboard and finding the new app.
 
+<b> Note: If you already have a Heroku application with the same app name, it will be overwritten </b>
 
 
 
