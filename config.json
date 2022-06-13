@@ -1,0 +1,10 @@
+{
+	"channelconf": [
+		{
+			"clientId": "YOUR_CLIENT_ID_HERE",
+			"clientSecret": "YOUR_CLIENT_SECRET_HERE",
+            "guildId": "YOUR_GUILD_ID_HERE"
+		}
+	],
+	"serverconf": {"port": 53134, "twinePath":"Twine/demo.html"}
+}

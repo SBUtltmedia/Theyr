@@ -31,10 +31,7 @@ for (let i = 1; i <= herokuInstances; i++) {
         `git push https://git.heroku.com/${app}-${i}.git HEAD:master`
     ]
     
-    // Add custom config variables
-    // "https://discord.com/api/oauth2/authorize?client_id=973930115820052490&redirect_uri=https%3A%2F%2Faztec-1.herokuapp.com&response_type=code&scope=identify%20guilds%20guilds.members.read"
-    // "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdistest-1.herokuapp.com%2F&response_type=code&scope=identify%20guilds.members.read%20guilds"
-    
+    // Add custom config variables    
     let redirectURL = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(`https://${app}-${i}.herokuapp.com`)}&response_type=code&scope=identify%20guilds.members.read%20guilds`.replace(/&/g, '"&"');
     console.log({redirectURL});
     configVars['redirectURL'] = redirectURL;
@@ -55,6 +52,3 @@ for (let i = 1; i <= herokuInstances; i++) {
         } catch(err) {}
     }
 }
-
-// "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdisctest-1.herokuapp.com&response_type=code&scope=identify%20guilds%20guilds.members.read"
-// "https://discord.com/api/oauth2/authorize?client_id=964554781169451098&redirect_uri=https%3A%2F%2Fdisctest-1.herokuapp.com&response_type=code&scope=identify%20guilds.members.read%20guilds"
