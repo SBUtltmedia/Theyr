@@ -7,7 +7,7 @@ Theyr is an extension to <a href="https://twinery.org/">Twine</a> <a href="http:
 
 ## How It Works
 If you're familiar with SugarCube, you'll know that the variables for a Twine story are stored within the SugarCube State. In order to provide a multiplayer experience, Theyr uses sockets to ensure that each player's SugarCube State is synchronized with every other player in the game. If one variable changes, all players' instances will be updated and kept in sync <br/><br/>
-There is one special variable $userId which gets created at logon can use the convention $user[$userId]["Name"]="Sammy" to set the current user's name and then a <<for>> loop to list all users
+There is one special variable $userId which gets created at logon can use the convention $user[$userId]["Name"]="Sammy" to set the current user's name and then a Sugarcube for loop to list all users
 That's it! You don't need to do anything extra to your Twine- the multiplayer features will come automatically from Theyr.
 
 ## Features
