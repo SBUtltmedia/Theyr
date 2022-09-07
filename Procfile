@@ -1,1 +1,1 @@
-web: node loginDiscord/index.js
+web: node login/index.js
