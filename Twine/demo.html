@@ -170,7 +170,7 @@ return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
 });
 }
 $(document).one(":passageend", () => {
-
+let name=window.location.search.split("nick=")[1].split("&")[0]
 let content=toHTMLEntities(`
 Your userId is: $userId 
 		<<if ndef $users>>		
@@ -178,7 +178,7 @@ Your userId is: $userId
 		<</if>>
 		<<if ndef $users[$userId]>>
 		<<set $users[$userId]={}>>
-		<<set $users[$userId]["name"]="sei">>
+		<<set $users[$userId]["name"]="${name}">>
 		<</if>>
 		<<liveblock>>
 		<<set _userIds=Object.keys($users)>>
