@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "nodemon login/",
-    "dev": "nodemon login/",
-    "discord": "nodemon loginDiscord/",
+    "start": "npx nodemon login/",
+    "dev": "npx nodemon login/",
+    "discord": "npx nodemon loginDiscord/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

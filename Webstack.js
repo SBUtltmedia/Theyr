@@ -1,6 +1,6 @@
 import express from 'express';
 import Db from './db.js'
-import Redux from 'redux'
+import Redux, { compose } from 'redux'
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const app = express();
@@ -37,34 +37,28 @@ class Webstack {
 	
 	initIO() {
 		io.on('connection', (socket) => {
-			let gstate = this.serverStore.getState();
-
+			let gstate = {...this.serverStore.getState() ,...database.getData()} ;
+		
 			// User connects 
 			socket.once('new user', (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
 
-				// If server has global state, send it to the user
-				if (typeof gstate !== 'undefined') {
+			
 					io.to(id).emit('new connection', gstate)
-				}
+				
 
 				// If server does not have the global state, retrieve it from the database and send it to the user
-				else {
-					console.log("Retrieving state from mongo", database.getData())
-					io.to(id).emit('new connection', database.getData())
-					// retrieveMongoState().then((mongoState) => {
-					// 	io.to(id).emit('new connection', mongoState.state)
-					// })
-				}
+		
 			})
 
-			// Difference found in SugarCube State, update all clients and MongoDB
+			// Difference found in SugarCube State, update all clients 
 			socket.on('difference', (state) => {
 				delete state['userId'] // Removes userId from the global state (Prevents users overriding each other's userId variables)
 				this.serverStore.dispatch({
 					type: 'UPDATE',
 					payload: state
 				})
+				console.log(state)
 				socket.broadcast.emit('difference', state)
 
 				database.setData(state) // Updates the database

@@ -18,6 +18,18 @@ const htmlTemplate = 'login/index.html';
 app.get('/', async ({ query }, response) => {
 	const userData = query;
 
+	const { code, state, test, nick } = query;
+	let userDataJSON;
+
+	// If using http://localhost:53134/?test=true use userDataJSON from this file
+	if (test) {
+		let nickname = "Cuauhtémoc"
+		let id = "229035280496197642"
+		if (nick) {
+			nickname = nick
+			id = generateId()
+		}	
+	}
 	if (userData.nick) {
 		return returnTwine(userData, response);
 	}

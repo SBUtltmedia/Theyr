@@ -4,7 +4,7 @@ import { execSync } from 'child_process';
 import { createRequire } from "module";
 import { exit } from 'process';
 const require = createRequire(import.meta.url);
-const configObj = require('./loginDiscord/config.json')
+const configObj = require('./login/config.json')
 
 // Checks command line arguments for app name
 const app = process.argv[2];

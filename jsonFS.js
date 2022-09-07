@@ -44,6 +44,7 @@ class JSONFS {
                 }
 
                 else {
+                    console.log(fileContents)
                     container[file] = JSON.parse(fileContents); // Converts data back to its original type from String
                 }
             }
@@ -74,7 +75,9 @@ class JSONFS {
                 fs.mkdirSync(this.home + passedObject, {
                     recursive: true
                 });
+                if (key!="{}"){
                 fs.writeFileSync(newDir, JSON.stringify(value)) // Serializes data as a string in order to store as a text file
+                }
             } catch(err) {
                 console.log(err);
             }

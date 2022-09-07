@@ -144,7 +144,8 @@ importScripts([
 
 // Run when passage starts 
 $(document).one(":passagestart", () => {
-    let usersCheck = State.variables.users || {};
+  
+  /*  let usersCheck = State.variables.users || {};
 	State.variables.users = usersCheck;
 	let users = State.variables.users;
 
@@ -152,7 +153,7 @@ $(document).one(":passagestart", () => {
     if (!(userData.id in users)) {
         users[userData.id] = {};
     }  
-
+*/
 	// Sets userId in State and LocalStorage
     localStorage.setItem('userId', userData.id);
     State.variables.userId = userData.id;
@@ -162,10 +163,39 @@ $(document).one(":passagestart", () => {
 	State.variables.ox_coins = 0;
 	State.variables.rabbit_coins = 0;
 });
-
+function toHTMLEntities(str){
+return str
+return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+  return '&#' + i.charCodeAt(0) + ';';
+});
+}
 $(document).one(":passageend", () => {
+
+let content=toHTMLEntities(`
+Your userId is: $userId 
+		<<if ndef $users>>		
+		<<set $users={}>>
+		<</if>>
+		<<if ndef $users[$userId]>>
+		<<set $users[$userId]={}>>
+		<<set $users[$userId]["name"]="sei">>
+		<</if>>
+		<<liveblock>>
+		<<set _userIds=Object.keys($users)>>
+		<<for _i to 0; _i lt _userIds.length; _i++>>
+ _userIds[_i]  is  <<print $users[_userIds[_i]].name>>
+<</for>>
+	<</liveblock>>
+`)
+if(window.location.hash){
+content=decodeURI(window.location.hash.split("#")[1])
+}
+window.location.hash=content
+$('#codepen').val(content)
+
 	$('#submit').on("mouseup", (e) => {
 		$('#codepen_wiki').empty().wiki($('#codepen').val());
+		window.location.hash=$('#codepen').val()
 	}).trigger("mouseup");
 	console.log($('#codepen'));
 });</script><tw-tag name="Done" color="green"></tw-tag><tw-tag name="New-Passage" color="purple"></tw-tag><tw-tag name="Text-to-be-updated-by-Ashley" color="orange"></tw-tag><tw-tag name="Breaks" color="blue"></tw-tag><tw-tag name="Change-Title" color="yellow"></tw-tag><tw-tag name="Coding-Problem" color="red"></tw-tag><tw-passagedata pid="1" name="Chat" tags="" position="350,101" size="100,100">&lt;&lt;set $chatlog=$chatlog || &quot;&quot;&gt;&gt;
@@ -173,10 +203,10 @@ $(document).one(":passageend", () => {
 	&lt;&lt;liveblock&gt;&gt;
 	$chatlog &lt;br&gt;
 	&lt;&lt;/liveblock&gt;&gt;
-	&lt;&lt;textbox &quot;$chattext&quot; &quot;&quot; autofocus&gt;&gt; 
+	&lt;&lt;textbox &quot;_chattext&quot; &quot;&quot; autofocus&gt;&gt; 
 
 	&lt;&lt;button &quot;Continue&quot;&gt;&gt;
-		&lt;&lt;set $chatlog += &quot;&lt;br&gt;&quot; + $users[$userId].username + &quot;: &quot; + $chattext&gt;&gt;
+		&lt;&lt;set $chatlog += &quot;&lt;br&gt;&quot; + $users[$userId].username + &quot;: &quot; + _chattext&gt;&gt;
 	&lt;&lt;/button&gt;&gt;
 	$chattext</tw-passagedata><tw-passagedata pid="2" name="Codepen" tags="" position="350,101" size="100,100">&lt;div class=&#39;maincontainer&#39;&gt;
 	&lt;div class=&#39;leftchild&#39;&gt;
@@ -192,10 +222,10 @@ $(document).one(":passageend", () => {
 		This entry contains all variables unique to that player. This allows Þeyr to keep track of variables pertaining to specific players, such as how many coins they&#39;ve collected or what items they have. &lt;br&gt;&lt;br&gt;
 
 		Change the textbox below to edit Theyr code:
-		&lt;textarea id=&#39;codepen&#39;&gt; Your userId is: &amp;dollar;userId &lt;/textarea&gt; 
-		/* &lt;div id=&quot;codepen&quot; contenteditable=&quot;true&quot;&gt;
-			&amp;dollar;userId
-		&lt;/div&gt; */
+		
+		&lt;textarea id=&#39;codepen&#39;&gt; 
+		&lt;/textarea&gt; 
+
 		&lt;button id=&quot;submit&quot;&gt;Save&lt;/button&gt;
 		
 	&lt;/div&gt;
