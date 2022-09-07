@@ -20,7 +20,7 @@ socket.on('new connection', (state) => {
     // If the server's state is empty, set with this client's state
     updateSugarCubeState(combinedState);
     $(document).trigger(":liveupdate");
-
+    socket.emit('difference',store)
 
 
 
