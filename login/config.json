@@ -1,13 +1,8 @@
 
     {
         "channelconf": [
-            { "clientId": "973930115820052490",
-            "clientSecret": "7LueI_7mVXNogaTKZI261yz1YbIAuSh2",
-            "guildId": "968922771692339291"},
-            { "clientId": "966339589734293544",
-                "clientSecret": "K3wiTQIC5ANHto0F211mItp34J4uBExQ",
-                "guildId": "973210028087603270"
-            }
+            { },
+            { }
         ],
         "serverconf": {"port": 53134, "twinePath":"Twine/demo.html"}
     }
