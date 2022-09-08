@@ -2,7 +2,7 @@
   <img src="https://res.cloudinary.com/dsry3cnco/image/upload/v1642440780/theyr_logo_axzsjz.png" alt="Theyr Logo"/>
 </p>
 Try a sample demo here. (https://theyr-1.herokuapp.com/).
-# Theyr (Twine Multiplayer)
+## Theyr (Twine Multiplayer)
 Theyr is an extension to <a href="https://twinery.org/">Twine</a> <a href="http://www.motoslave.net/sugarcube/2/">SugarCube</a> that allows you to create multiplayer stories that update in real time. Standalone Twine only provides support for single player stories, but through the SugarCube story format, JavaScript, and  <a href="https://socket.io/">Socket.IO</a>, multiplayer Twine becomes possible. Once you've written your Twine story, all you have to do is follow the instructions below to deploy the application to Heroku and make your game available to play over the web!
 
 ## How It Works
