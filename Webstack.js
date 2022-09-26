@@ -58,7 +58,7 @@ class Webstack {
 					type: 'UPDATE',
 					payload: state
 				})
-				console.log(state)
+				//console.log(state)
 				socket.broadcast.emit('difference', state)
 
 				database.setData(state) // Updates the database

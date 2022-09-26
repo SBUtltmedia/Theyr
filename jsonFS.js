@@ -44,7 +44,6 @@ class JSONFS {
                 }
 
                 else {
-                    console.log(fileContents)
                     container[file] = JSON.parse(fileContents); // Converts data back to its original type from String
                 }
             }
@@ -56,6 +55,7 @@ class JSONFS {
     }
 
     setJSON(jsonObj, passedObject = "") {
+        console.log(jsonObj, passedObject)
         if (jsonObj !== null && (this.dataType(jsonObj) == "object" || this.dataType(jsonObj) == "array")) {
             if (JSON.stringify(jsonObj) === '{}') {
                 this.setKeyPair("{}", "", passedObject);
@@ -68,25 +68,37 @@ class JSONFS {
     }
 
     setKeyPair(key, value, passedObject) {
+        let newDir = this.home + passedObject + key
         if (this.dataType(value) != "object" && this.dataType(value) != "array") {
-            let newDir = this.home + passedObject + key
+           
             this.delTree(newDir)
             try {
+           
+            
                 fs.mkdirSync(this.home + passedObject, {
                     recursive: true
                 });
+               
                 if (key!="{}"){
                 fs.writeFileSync(newDir, JSON.stringify(value)) // Serializes data as a string in order to store as a text file
-                }
+                
+            }
             } catch(err) {
                 console.log(err);
             }
 
         } else {
+            console.log(value)
             // let newDir = this.home + passedObject + key
             if (this.dataType(value) === "object") {
                 key = `-${key}-`
             }
+            else 
+            if(value==undefined)
+            {
+                this.delTree(newDir) 
+            }
+
 
             // console.log("Key is", key)
             // console.log(value, passedObject + key + path.sep)
@@ -134,21 +146,25 @@ class JSONFS {
 
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    // let testData = {
+    //     "title": "test2",
+    //     "array": ["Tim"],
+    //     "users": {
+    //         "123456789": {
+    //             "name": "Paul",
+    //             "coins": 23
+    //         }
+    //     }
+    // }
     let testData = {
-        "title": "test2",
-        "array": ["Tim"],
-        "users": {
-            "123456789": {
-                "name": "Paul",
-                "coins": 23
-            }
-        }
+        "title": "test23",
     }
 
+
     let jsonFS = new JSONFS();
-    jsonFS.wipeData();
-    // jsonFS.setJSON(testData);
-    // console.log(JSON.stringify(jsonFS.getJSON()));
+   // jsonFS.wipeData();
+     jsonFS.setJSON(testData);
+    console.log(JSON.stringify(jsonFS.getJSON()));
 }
 
 export default JSONFS;

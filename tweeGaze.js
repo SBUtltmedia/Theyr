@@ -1,7 +1,7 @@
 import gaze from 'gaze'
-import fs, { existsSync } from 'fs'
-import { exec, execFile } from 'child_process';
-import Extwee, { HTMLWriter, StoryFormat, StoryFormatParser, TweeWriter } from 'extwee'
+import fs from 'fs'
+import {  execFile } from 'child_process';
+
 
 let tweegoBinaries = {"win32":"binaries/tweego-2.1.1-windows-x64", "linux":"binaries/tweego-2.1.1-macos-x64", "darwin":"binaries/tweego-2.1.1-macos-x64"};
 let tweeBinary = tweegoBinaries[process.platform] || tweegoBinaries["linux"];
