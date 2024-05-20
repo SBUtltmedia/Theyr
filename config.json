@@ -18,5 +18,5 @@
 		}
 
 	],
-	"serverconf": {"port": 53134, "twinePath":"Twine/demo.html" }
+	"serverconf": {"port": 53134, "twinePath":"Twine/demo.html", "fileName":"theyr" }
 }
