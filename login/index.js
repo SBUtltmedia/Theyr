@@ -11,7 +11,8 @@ const { port, twinePath } = configObj.serverconf;
 const PORT = process.env.PORT || port
 const TWINE_PATH = process.env.twinePath || twinePath;
 const appID = process.env.appID || 1
-const { app } = new webstack(configObj.serverconf).get();
+const SERVERCONF = { "port": PORT, "twinePath": TWINE_PATH, "fileName": FILENAME, "appIndex": appID}
+const { app } = new webstack(SERVERCONF).get();
 const htmlTemplate = 'login/index.html';
 
 // Listen for requests to the homepage
