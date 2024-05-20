@@ -1,6 +1,9 @@
 .maincontainer {
     /* width: 80rem; */
     width: 100%;
+    height:1000px;
+    padding-top:50px;
+    padding-bottom:100px;
 }
 
 .leftchild {
@@ -9,6 +12,9 @@
 }
 
 .rightchild {
+    position: -webkit-sticky;
+    position: sticky;
+    top:0;
     width: 42%;
     float: right;
 }

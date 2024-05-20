@@ -1,13 +1,13 @@
 :: StoryTitle
-Wishing Wells
+Theyr Chat Demo
 
 
 :: StoryData
 {
 	"ifid": "5CAF53F2-B97C-45CA-9E53-CBD50086BDA5",
 	"format": "SugarCube",
-	"format-version": "2.30.0",
-	"start": "Codepen",
+	"format-version": "2.37.0-alpha.5",
+	"start": "Chat",
 	"tag-colors": {
 		"Breaks": "blue",
 		"Change-Title": "yellow",
@@ -21,36 +21,43 @@ Wishing Wells
 
 
 :: Story Stylesheet [stylesheet]
-@import url("Twine/demo_style.css");
+
 
 
 :: Story JavaScript [script]
+Save.clear()
 Config.passages.nobr = true;
 Window.SugarCubeState = State;
-var urlPrefix="static/"
+
+var urlPrefix="static/";
+let lockId= LoadScreen.lock() 
 
 importScripts([
 	'/socket.io/socket.io.js',
-	'https://unpkg.com/redux@latest/dist/redux.min.js',
 	'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js',
 	`${urlPrefix}Client.js`,
 	"https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js",
 	"https://unpkg.com/jquery.nice-number@2.1.0/dist/jquery.nice-number.min.js",
-	"https://code.jquery.com/ui/1.12.1/jquery-ui.js"	
-]);
+	"https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+	]	
+)
+	.then(function() {
+		initTheyr({lockId,callback:LoadScreen.unlock})
+
+		State = new Proxy(State, createHandler())
+	}
+);
 
 (function () {
 	"use strict";
 
 	$(document).on(":liveupdate", function () {
-		console.log("In liveupdate");
 		$(".macro-live").trigger(":liveupdateinternal");
 	});
 
 	Macro.add(['liveblock', 'lb'], {
 		tags: null,
 		handler: function handler() {
-			console.log("In liveblock");
 			try {
 				var content = this.payload[0].contents.trim();
 				if (content) {
@@ -64,145 +71,70 @@ importScripts([
 			}
 		}
 	});
+
+	Macro.add(['userlist'], {
+		tags: null,
+		handler: function handler() {
+			try {
+				const Discord = require('discord.js');
+				const client = new Discord.Client();
+				const list = client.guilds.cache.get("myServerID"); 
+				
+			} catch (e) {
+				return e;
+			}
+		}
+	});
+
+	Macro.add(['discord'], {
+		tags: null,
+		handler: function handler() {
+			try {
+				let message = this.payload[0].contents.trim();
+				let channel = this.payload[0].arguments;
+				$.post("/discordbot", {message, channel}, () => {});
+			} catch (e) {
+				return e;
+			}
+		}
+	});
 })();
 
 
-// Run when passage starts 
-$(document).one(":passagestart", () => {
-  
-  /*  let usersCheck = State.variables.users || {};
-	State.variables.users = usersCheck;
-	let users = State.variables.users;
+:: StoryInit {"position":"22,135","size":"100,100"}
+<<if ndef $lookup>>
+<<set $lookup={}>>
+<</if>>
 
-    // If client does not exist in Users, add them
-    if (!(userData.id in users)) {
-        users[userData.id] = {};
-    }  
-*/
-	// Sets userId in State and LocalStorage
-    localStorage.setItem('userId', userData.id);
-    State.variables.userId = userData.id;
+<<if ndef $users >>
+<<set $users={}>>
+<</if>>
 
-	// Story Init Code
-	State.variables.tiger_coins = 0;
-	State.variables.ox_coins = 0;
-	State.variables.rabbit_coins = 0;
-});
-function toHTMLEntities(str){
-return str
-return str.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
-  return '&#' + i.charCodeAt(0) + ';';
-});
-}
-$(document).one(":passageend", () => {
-let name=window.location.search.split("nick=")[1].split("&")[0]
-let content=toHTMLEntities(`
-Your userId is: $userId 
-		<<if ndef $users>>		
-		<<set $users={}>>
-		<</if>>
-		<<if ndef $users[$userId]>>
-		<<set $users[$userId]={}>>
-		<<set $users[$userId]["name"]="${name}">>
-		<</if>>
-		<<liveblock>>
-		<<set _userIds=Object.keys($users)>>
-		<<for _i to 0; _i lt _userIds.length; _i++>>
- _userIds[_i]  is  <<print $users[_userIds[_i]].name>>
-<</for>>
-	<</liveblock>>
-`)
-if(window.location.hash){
-content=decodeURI(window.location.hash.split("#")[1])
-}
-window.location.hash=content
-$('#codepen').val(content)
+<<set _searchParams = new URLSearchParams(location.search) >>
 
-	$('#submit').on("mouseup", (e) => {
-		$('#codepen_wiki').empty().wiki($('#codepen').val());
-		window.location.hash=$('#codepen').val()
-	}).trigger("mouseup");
-	console.log($('#codepen'));
-});
+<<set $userId=_searchParams.get('id') || userData.authData.id >>
+
+
+<<if ndef $users[$userId]>>
+	<<set $users[$userId] = {}>>
+	<<set $users[$userId]["nick"]=_searchParams.get('nick') || userData.authData.nick>>
+<</if>>
+
+
 
 
 :: Chat {"position":"350,101","size":"100,100"}
-<<set $chatlog=$chatlog || "">>
-	<<set $chattext=$chattext  || "">>
+<<if ndef $chatlog >>
+<<set $chatlog= "Chat:">>
+<</if>>
+
 	<<liveblock>>
 	$chatlog <br>
 	<</liveblock>>
 	<<textbox "_chattext" "" autofocus>> 
 
 	<<button "Continue">>
-		<<set $chatlog += "<br>" + $users[$userId].username + ": " + _chattext>>
+		<<set $chatlog += "<br>" + $users[$userId]["nick"] + ": " + _chattext>>
 	<</button>>
-	$chattext
 
-
-:: Codepen {"position":"350,101","size":"100,100"}
-<div class='maincontainer'>
-	<div class='leftchild'>
-		Welcome to Þeyr! (You can pronounce it as "Theyr") <br> <br>
-		Þeyr is an extension to Twine SugarCube that allows you to create real-time multiplayer stories. 
-		This works by sharing all SugarCube variables between the connected players. If one variable changes, all players instances will be updated and kept in sync. <br><br>
-
-		The only variable this doesn't apply to is <code>userId</code> which is a unique Id that identifies a particular client. <br><br>
-
-		Here's your <code>userId</code>: $userId <br><br>
-
-		The <code>users</code> object stores information about individual users. <code>userId</code> is used as a key to access a particular user in the <code>users</code> mapping. 
-		This entry contains all variables unique to that player. This allows Þeyr to keep track of variables pertaining to specific players, such as how many coins they've collected or what items they have. <br><br>
-
-		Change the textbox below to edit Theyr code:
-		
-		<textarea id='codepen'> 
-		</textarea> 
-
-		<button id="submit">Save</button>
-		
-	</div>
-	
-	<div class='rightchild'>
-		<div class='resultsbox' id='codepen_wiki'>
-			
-		</div>
-	</div>
-</div>
-
-
-:: Wishing Wells {"position":"350,100","size":"100,100"}
-<<liveblock>>
-You approach a shrine that has three wishing wells: The Tiger Well, Ox Well, and Rabbit Well. 
-<br><br>
-<table>
-	<tr>
-		<td> Tiger Well: </td>
-		<td />
-		<td> <b> $tiger_coins Coins </b> </td>
-	</tr>
-	<tr>
-		<td> Ox Well: </td>
-		<td />
-		<td>  <b> $ox_coins Coins </b> </td>
-	</tr>
-	<tr>
-		<td> Rabbit Well: </td>
-		<td />
-		<td> <b> $rabbit_coins  Coins </b> </td>
-	</tr>
-
-</table>
-<br>
-<<button "Add to Tiger Well">>
-	<<set $tiger_coins++>>
-<</button>>
-<<button "Add to Ox Well">>
-	<<set $ox_coins++>>
-<</button>>
-<<button "Add to Rabbit Well">>
-	<<set $rabbit_coins++>>
-<</button>>
-
-<</liveblock>>
 
