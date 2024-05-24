@@ -12,7 +12,8 @@ const PORT = process.env.PORT || port
 const TWINE_PATH = process.env.twinePath || twinePath;
 const appID = process.env.appID || 1
 const SERVERCONF = { "port": PORT, "twinePath": TWINE_PATH}
-const { app } = new webstack(SERVERCONF).get();
+const webstackInstance = new webstack(SERVERCONF)
+const { app } = webstackInstance.get();
 const htmlTemplate = 'login/index.html';
 
 // Listen for requests to the homepage
@@ -21,7 +22,7 @@ app.get('/', async ({ query }, response) => {
 	const userData = query;
 
 	if (userData.nick) {
-		return returnTwine(userData, response);
+		return returnTwine({ gameState: webstackInstance.serverStore.getState()}, response);
 	}
 
 	else {
@@ -32,6 +33,19 @@ app.get('/', async ({ query }, response) => {
 });
 
 function returnTwine(userData, response) {
+	//removes private vars
+	if(userData.gameState.theyrPrivateVars){
+		Object.keys(userData.gameState.theyrPrivateVars).forEach((id)=>{
+			if(userData.authData && id != userData.authData.id){
+				delete userData.gameState.theyrPrivateVars[id];
+			}
+		})
+	}
+
+	if(!userData.gameState.theyrPrivateVars){
+		userData.gameState.theyrPrivateVars = {};
+	}
+
 	let userDataScript=`
 		<script>let userData=${JSON.stringify(userData)}</script>
 	`

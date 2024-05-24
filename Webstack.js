@@ -22,6 +22,10 @@ class Webstack {
 
 		//serverStore stores the current game state and is backed up via gitApiIO because Heroku is ephemeral 
 		this.serverStore = Redux.createStore(this.reducer);
+		this.serverStore.dispatch({
+			type: 'UPDATE',
+			payload: {}
+		})
 		this.initIO();
 
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`)
