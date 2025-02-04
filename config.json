@@ -1,19 +1,19 @@
 {
 	"channelconf": [
 		{
-			"clientId": "1062455250562322504",
-			"clientSecret": "DSdwDUTErau2s-yU96pe6CrtPXPFwVZ2",
-			"guildId": "1062455060770078741",
+			"clientId": "",
+			"clientSecret": "",
+			"guildId": "",
 			"discordChannelNames": "aztec,spanish,tlax,aztecSpan,aztecTlax,spanTlax,general,omen",
 			"discordChannels":{
-				"aztecs": "https://discord.com/api/webhooks/1064657723880374393/DTRd71M6sk-RSK-1AeJ9u-i6mLFeqy-ej-rZSr0QC0PSnPATI16fQxX8gxWvB9-dCDmp",
-				"spanish": "https://discord.com/api/webhooks/1064694789435568159/XSpZSoe506GFJPqjx5FibyyitQ_0sBQumuMOPuSMAqWiFhpYGwTCHH6TDFZYGKSA0YWy",
-				"tlax": "https://discord.com/api/webhooks/1064695101621813248/SUCRDupMuuwK0Xf_VNKvYagRo8kPEpTXA-TTVRBl9UHUalCwKbrdwuYamW_BPE2jPyUZ",
-				"aztecSpan": "https://discord.com/api/webhooks/1064695713407185007/UrjhyfkmvWxldfLuH6QeUNOm9EuTozI8EmZAMUQAIPGLDiNS5d8vp7gTghtF2-5MfwHt",
-				"aztecTlax": "https://discord.com/api/webhooks/1064695789189873684/Fta447Pm-qBWsThnplqab8rqyfGtjk8MZHkDnHbvmg9pmnor4yK14B91iEG0dhOzINNd",
-				"spanTlax": "https://discord.com/api/webhooks/1064695894705979452/8PBG5qS1MoAlzsMVIFBpsxwSvHYpOIfV3pSb8yMW9SDpfc8tzod6uGeg0OvZUc6JLQbT",
-				"general": "https://discord.com/api/webhooks/1064695961311518810/uzC-AT1fofFe6j98xaUQJKfoSQN_5cBsiIvsiKJyONts2ZH6BodQUjTpFkuWYNEaQ3u-",
-				"omen": "https://discord.com/api/webhooks/1064696029276016702/woggXoXSlV1y5YP0b5C9Gm2PykSD1tlZYB_GjiiAnS6WgdMX71WhrmYKo1nnmbZxs0DY"
+				"aztecs": "",
+				"spanish": "",
+				"tlax": "",
+				"aztecSpan": "",
+				"aztecTlax": "",
+				"spanTlax": "",
+				"general": "",
+				"omen": ""
 			}
 		}
 
