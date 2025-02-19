@@ -33,8 +33,7 @@ importScripts([
 	'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js',
 	`${urlPrefix}Client.js`,
 	"https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js",
-	"https://unpkg.com/jquery.nice-number@2.1.0/dist/jquery.nice-number.min.js",
-	"https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+	"https://unpkg.com/jquery.nice-number@2.1.0/dist/jquery.nice-number.min.js"
 	]	
 )
 	.then(function() {
@@ -81,7 +80,7 @@ importScripts([
 <<if ndef $lookup>>
 <<set $lookup={}>>
 <</if>>
-
+<<set $coins = 0>>
 <<if ndef $users >>
 <<set $users={}>>
 <</if>>
@@ -100,7 +99,7 @@ importScripts([
 :: Chat {"position":"350,101","size":"100,100"}
 <<if ndef $chatlog >>
 <<set $chatlog= "Chat:">>
-<</if>>
+<</if>> 
 
 	<<liveblock>>
 	$chatlog <br>

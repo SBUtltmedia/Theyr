@@ -110,8 +110,7 @@ importScripts([
 	'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js',
 	`${urlPrefix}Client.js`,
 	"https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.11/jquery.csv.min.js",
-	"https://unpkg.com/jquery.nice-number@2.1.0/dist/jquery.nice-number.min.js",
-	"https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+	"https://unpkg.com/jquery.nice-number@2.1.0/dist/jquery.nice-number.min.js"
 	]	
 )
 	.then(function() {
@@ -154,7 +153,7 @@ importScripts([
 &lt;&lt;if ndef $lookup&gt;&gt;
 &lt;&lt;set $lookup={}&gt;&gt;
 &lt;&lt;/if&gt;&gt;
-
+&lt;&lt;set $coins = 0&gt;&gt;
 &lt;&lt;if ndef $users &gt;&gt;
 &lt;&lt;set $users={}&gt;&gt;
 &lt;&lt;/if&gt;&gt;
@@ -169,7 +168,7 @@ importScripts([
 	&lt;&lt;set $users[$userId][&quot;nick&quot;]=_searchParams.get(&#39;nick&#39;) || userData.authData.nick&gt;&gt;
 &lt;&lt;/if&gt;&gt;</tw-passagedata><tw-passagedata pid="2" name="Chat" tags="" position="350,101" size="100,100">&lt;&lt;if ndef $chatlog &gt;&gt;
 &lt;&lt;set $chatlog= &quot;Chat:&quot;&gt;&gt;
-&lt;&lt;/if&gt;&gt;
+&lt;&lt;/if&gt;&gt; 
 
 	&lt;&lt;liveblock&gt;&gt;
 	$chatlog &lt;br&gt;

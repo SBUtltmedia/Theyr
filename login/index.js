@@ -16,6 +16,8 @@ const webstackInstance = new webstack(SERVERCONF)
 const { app } = webstackInstance.get();
 const htmlTemplate = 'login/index.html';
 
+
+
 // Listen for requests to the homepage
 app.get('/', async ({ query }, response) => {
 	//userData is info from discord

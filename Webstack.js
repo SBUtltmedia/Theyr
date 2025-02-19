@@ -7,9 +7,19 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const _ = require("lodash"); 
 var base64 = require('js-base64');
+const Redis = require('ioredis');
+
+const redis = new Redis({
+	host: '127.0.0.1',
+	port: 6379
+});
 
 
+// io.on('connect', (socket) => {
+// 	console.log("A client connected: ", socket.id);
 
+// 	socket.on
+// })
 
 class Webstack {
 	constructor(serverConf) {
@@ -59,6 +69,15 @@ class Webstack {
 				return state
 		}
 	}
+
+	async redisAtomicWrite(key, value) {
+		const script = `
+		redis.call('SET', '${key}', '${JSON.stringify(value)}')
+		return redis.call('GET', '${key}')
+		`;
+		const newCount = await redis.eval(script, 0);
+		return newCount;
+	}
 	
 	initIO() {
 		io.on("connect_error", (err) => {
@@ -66,19 +85,14 @@ class Webstack {
 		  });
 		io.on('connection', (socket) => {
 			let gstate = this.serverStore.getState();
-
 			// User connects 
 			socket.once('new user', (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
-
 			
 				if (typeof gstate !== 'undefined') {
 					//console.log("gstate", JSON.stringify(gstate))
 					io.to(id).emit('new connection', gstate)
-				}
-
-			
-				else {
+				} else {
 					//console.log("Retrieving state from JSONFS", database.getData())
 					io.to(id).emit('new connection', {})
 				}
@@ -86,13 +100,20 @@ class Webstack {
 
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
-			socket.on('difference', (diff) => {
+			socket.on('difference', async (diff) => {
 				this.serverStore.dispatch({
 					type: 'UPDATE',
 					payload: diff
 				})
+				console.log("Log diff: ", diff)
+				this.redisAtomicWrite("diff", diff);
 				//sends message to all other clients unless inside theyrPrivateVars
-				if(!Object.keys(diff).includes("theyrPrivateVars")){
+				if(!Object.keys(diff).includes("theyrPrivateVars")) {
+					// redis.get('diff', (err, data) => {
+					// 	if (data) {
+					// 		socket.broadcast.emit('difference', JSON.parse(data));
+					// 	}
+					// })
 					socket.broadcast.emit('difference', diff)
 				}
 			})
