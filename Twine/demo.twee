@@ -24,6 +24,7 @@ Theyr Chat Demo
 Save.clear()
 Config.passages.nobr = true;
 Window.SugarCubeState = State;
+Window.SugarVariables = State.variables;
 
 var urlPrefix="static/";
 let lockId= LoadScreen.lock() 
@@ -39,7 +40,7 @@ importScripts([
 	.then(function() {
 		initTheyr({lockId,callback:LoadScreen.unlock})
 
-		State = new Proxy(State, createHandler())
+		SugarVariables = new Proxy(SugarVariables, createHandler())
 	}
 );
 

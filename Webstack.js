@@ -62,7 +62,6 @@ class Webstack {
 				let temp = _.merge(state, action.payload);
 				// console.log("temp:", JSON.stringify(temp.users))
 				return temp;
-
 			case 'REPLACE':
 				return action.payload;
 			default:
@@ -83,15 +82,20 @@ class Webstack {
 		io.on("connect_error", (err) => {
 			console.log(`connect_error due to ${err.message}`);
 		  });
-		io.on('connection', (socket) => {
-			let gstate = this.serverStore.getState();
+		io.on('connection', async (socket) => {
+			const keys = await redis.keys("*");
+			const state = {}
+			for (let key of keys) {
+				state[key] = await redis.get(key);
+			}
+			console.log(state);
+			// let gstate = this.serverStore.getState();
 			// User connects 
 			socket.once('new user', (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
-			
 				if (typeof gstate !== 'undefined') {
 					//console.log("gstate", JSON.stringify(gstate))
-					io.to(id).emit('new connection', gstate)
+					io.to(id).emit('new connection', state)
 				} else {
 					//console.log("Retrieving state from JSONFS", database.getData())
 					io.to(id).emit('new connection', {})
@@ -101,23 +105,25 @@ class Webstack {
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('difference', async (diff) => {
-				this.serverStore.dispatch({
-					type: 'UPDATE',
-					payload: diff
-				})
-				console.log("Log diff: ", diff)
 				this.redisAtomicWrite("diff", diff);
-				//sends message to all other clients unless inside theyrPrivateVars
-				if(!Object.keys(diff).includes("theyrPrivateVars")) {
-					// redis.get('diff', (err, data) => {
-					// 	if (data) {
-					// 		socket.broadcast.emit('difference', JSON.parse(data));
-					// 	}
-					// })
-					socket.broadcast.emit('difference', diff)
+				for (const key in diff) {
+					this.redisAtomicWrite(`${key}`, diff[key]);
 				}
-			})
-
+				console.log("diff: ", diff);
+				if(!Object.keys(diff).includes("theyrPrivateVars")) {
+					let returnDiff = {};
+					for (const key in diff) {
+						console.log("Getting data");
+						redis.get(`${key}`, (err, data) => {
+							if (data) {
+								returnDiff[key] = data;
+							}
+						})
+					}
+					console.log("Sending in diff");
+					socket.broadcast.emit('difference', returnDiff);
+				}
+			});
 
 			socket.on('fullReset', ()=>{
 				console.log("reset start 2")
