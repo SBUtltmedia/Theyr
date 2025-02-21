@@ -71,7 +71,7 @@ class Webstack {
 
 	async redisAtomicWrite(key, value) {
 		const script = `
-		redis.call('SET', '${key}', '${JSON.stringify(value)}')
+		redis.call('SET', '${key}', '${value}')
 		redis.call('SADD', 'theyr', '${key}')
 		return redis.call('GET', '${key}')
 		`;
@@ -116,12 +116,18 @@ class Webstack {
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('difference', async (diff) => {
-				for (const key in diff) {
+				console.log("diff: ", diff);
+				for (let key of Object.keys(diff)) {
 					if (key !== "userId" && key !== "nick") {
-						await this.redisAtomicWrite(`${key}`, diff[key]);
+						let val = diff[key];
+						console.log("diff val: ", val);
+						if (typeof val === 'object' && val !== null) {
+							val = JSON.stringify(val);
+							console.log("new val: ", val);
+						}
+						await this.redisAtomicWrite(`${key}`, val);
 					}
 				}
-				console.log("diff: ", diff);
 				let returnDiff = {};
 				const keys = await this.redisAtomicGetKeys();
 				for (let key of keys) {
@@ -130,9 +136,15 @@ class Webstack {
 						let val = await redis.get(`${key}`);
 						if (val !== null) {
 							console.log("val: ", val);
-							val = JSON.parse(val);
-							console.log("Getting data: ", JSON.stringify(val));
-							returnDiff[key] = val;
+							let newVal;
+							try {
+								newVal = JSON.parse(val);
+							} catch (e) {
+								console.log("Could not convert val", e);
+								newVal = val
+							}
+							console.log("Getting data: ", newVal);
+							returnDiff[key] = newVal;
 							console.log(returnDiff[key]);
 						}
 					}

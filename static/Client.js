@@ -5,6 +5,7 @@ let lockInfo = {};
 var gameVars;
 var lastStats = [];
 var buffer = [];
+var emitFlag = false;
 
 function init() {
     // $('#passages').html($('#passages').html().replace(/<br><br>/gm, ""));
@@ -99,9 +100,11 @@ function diffSet(pathArr, value) {
 }
 
 function emitNewVars(newState) {
-    console.log("new state: ", newState);
-    socket.emit('difference', newState);
-    $(document).trigger(":liveupdate");
+    if (emitFlag) {
+        console.log("new state: ", newState);
+        socket.emit('difference', newState);
+        $(document).trigger(":liveupdate");
+    }
 }
 
 function initTheyr(lockInfo) {
@@ -119,8 +122,22 @@ function initTheyr(lockInfo) {
     socket.on('new connection', (state) => {
         // console.log("LOAD #2: RECEIEVE STATE");
         console.log("Connecting state:", state)
+        for (let key of Object.keys(state)) {
+            let val = state[key];
+            let newVal;
+            try {
+                newVal = JSON.parse(val);
+            } catch (e) {
+                console.log("Couldn't parse", e);
+                newVal = val;
+            }
+            state[key] = newVal;
+        }
         // console.log("Current State:", Window.SugarCubeState.variables)
-        let combinedState = Object.assign({}, Window.SugarCubeState.variables, state)
+        let newState = Object.assign({}, Window.SugarCubeState.variables, state);
+        updateSugarCubeState(newState);
+
+        emitFlag = true;
         // console.log("Combined State", combinedState)
         // If the server's state is empty, set with this client's state
         //    updateSugarCubeState(combinedState);
