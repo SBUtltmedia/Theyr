@@ -38,9 +38,8 @@ importScripts([
 	]	
 )
 	.then(function() {
-		initTheyr({lockId,callback:LoadScreen.unlock})
-
 		State = new Proxy(State, createHandler())
+		initTheyr({lockId,callback:LoadScreen.unlock})
 	}
 );
 

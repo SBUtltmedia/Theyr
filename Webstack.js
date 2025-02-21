@@ -36,6 +36,7 @@ class Webstack {
 			type: 'UPDATE',
 			payload: {}
 		})
+		this.socketClientMap = new Map();
 		this.initIO();
 
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`)
@@ -84,7 +85,6 @@ class Webstack {
 		return redis.call('SMEMBERS', 'theyr')
 		`
 		const keys = await redis.eval(script, 0);
-		console.log("KEYSSSSS: ", keys);
 		return keys;
 	}
 	
@@ -93,17 +93,19 @@ class Webstack {
 			console.log(`connect_error due to ${err.message}`);
 		  });
 		io.on('connection', async (socket) => {
-			const keys = await this.redisAtomicGetKeys();
-			const state = {}
-			for (let key of keys) {
-				state[key] = await redis.get(key);
-			}
+			console.log("New connection!!!: ", socket.id);
 			// let gstate = this.serverStore.getState();
 			// User connects 
-			socket.once('new user', (id) => {
+			socket.on('new user', async (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
+
+				this.socketClientMap.set(socket.id, id);
+				const keys = await this.redisAtomicGetKeys();
+				const state = {};
+				for (let key of keys) {
+					state[key] = await redis.get(key);
+				}
 				console.log("connecting state: ", state);
-				
 				if (typeof state !== 'undefined') {
 					//console.log("gstate", JSON.stringify(gstate))
 					io.to(id).emit('new connection', state)
@@ -111,19 +113,31 @@ class Webstack {
 					//console.log("Retrieving state from JSONFS", database.getData())
 					io.to(id).emit('new connection', {})
 				}
-			})
+			});
+
+			socket.on('disconnect', async () => {
+				let userID = this.socketClientMap.get(socket.id);
+				if (userID !== undefined) {
+					this.socketClientMap.delete(socket.id);
+					let users = await redis.get("users");
+					if (users !== null || users !== undefined) {
+						users = JSON.parse(users);
+						delete users[userID];
+						await this.redisAtomicWrite("users", JSON.stringify(users));
+					}
+				}
+				console.log("User disconnected: ", userID);
+			})			
 
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('difference', async (diff) => {
-				console.log("diff: ", diff);
+				// console.log("diff: ", diff);
 				for (let key of Object.keys(diff)) {
 					if (key !== "userId" && key !== "nick") {
 						let val = diff[key];
-						console.log("diff val: ", val);
 						if (typeof val === 'object' && val !== null) {
 							val = JSON.stringify(val);
-							console.log("new val: ", val);
 						}
 						await this.redisAtomicWrite(`${key}`, val);
 					}
@@ -135,23 +149,23 @@ class Webstack {
 					if (key !== "userId" && key !== "theyrPrivateVars") {
 						let val = await redis.get(`${key}`);
 						if (val !== null) {
-							console.log("val: ", val);
+							// console.log("val: ", val);
 							let newVal;
 							try {
 								newVal = JSON.parse(val);
 							} catch (e) {
-								console.log("Could not convert val", e);
+								// console.log("Could not convert val", e);
 								newVal = val
 							}
-							console.log("Getting data: ", newVal);
+							// console.log("Getting data: ", newVal);
 							returnDiff[key] = newVal;
 							console.log(returnDiff[key]);
 						}
 					}
 				}
-				console.log("Return diff: ", returnDiff);
+				// console.log("Return diff: ", returnDiff);
 				if (Object.keys(returnDiff).length > 0) {
-					console.log("Sending in diff: ", returnDiff);
+					// console.log("Sending in diff: ", returnDiff);
 					socket.broadcast.emit('difference', returnDiff);
 				}
 			});

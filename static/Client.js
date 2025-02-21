@@ -114,9 +114,11 @@ function initTheyr(lockInfo) {
     socket = io();
     // Receive state from server upon connecting, then update all other clients that you've connected
     socket.on('connect', () => {
+        console.log("socket.id: ", socket.id);
         socket.emit('new user', socket.id);
         console.log(lockInfo)
-        lockInfo.callback(lockInfo.lockId)
+        lockInfo.callback(lockInfo.lockId);
+        console.log("lockscreen unlocked");
     })
 
     socket.on('new connection', (state) => {
@@ -151,14 +153,14 @@ function initTheyr(lockInfo) {
         updateSugarCubeState(diff)
         _.merge(buffer, diff)
         $(document).trigger(":liveupdate");
-    })
+    });
 
     socket.on('reset', (diff) => {
         console.log("reseting sugarcube", diff);
         resetSugarCubeState(diff)
 
         $(document).trigger(":liveupdate");
-    })
+    });
 }
 
 // Updates client's SugarCube State when state changes are received from the server
