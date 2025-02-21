@@ -56,11 +56,11 @@ function createHandler(path = []) {
             }
         },
         set(target, key, value) {
-            console.log(`Set ${key}: ${value}`);
             if (target[key] != value) {
                 target[key] = value
                 path.shift();
-                diffSet([...path, key], value)
+                // diffSet([...path, key], value);
+                emitNewVars(target);
             }
             return true
         }
@@ -98,6 +98,12 @@ function diffSet(pathArr, value) {
 
 }
 
+function emitNewVars(newState) {
+    console.log("new state: ", newState);
+    socket.emit('difference', newState);
+    $(document).trigger(":liveupdate");
+}
+
 function initTheyr(lockInfo) {
 
     updateSugarCubeState(userData.gameState);
@@ -114,7 +120,7 @@ function initTheyr(lockInfo) {
         // console.log("LOAD #2: RECEIEVE STATE");
         console.log("Connecting state:", state)
         // console.log("Current State:", Window.SugarCubeState.variables)
-        let combinedState = Object.assign({}, Window.SugarVariables, state)
+        let combinedState = Object.assign({}, Window.SugarCubeState.variables, state)
         // console.log("Combined State", combinedState)
         // If the server's state is empty, set with this client's state
         //    updateSugarCubeState(combinedState);
@@ -123,6 +129,7 @@ function initTheyr(lockInfo) {
 
     // Incoming difference, update your state and store
     socket.on('difference', (diff) => {
+        console.log("got a difference");
         console.log("updating sugarcube", diff);
         updateSugarCubeState(diff)
         _.merge(buffer, diff)
@@ -139,16 +146,17 @@ function initTheyr(lockInfo) {
 
 // Updates client's SugarCube State when state changes are received from the server
 function updateSugarCubeState(new_state) {
-    _.merge(Window.SugarVariables, new_state);
+    console.log("New State: ", new_state);
+    _.merge(Window.SugarCubeState.variables, new_state);
 
     $(document).trigger(":liveupdate");
 }
 
 // Updates client's SugarCube State when state changes are received from the server
 function resetSugarCubeState(new_state) {
-    for (var member in Window.SugarVariables) delete Window.SugarVariables[member];
-    Window.SugarVariables.variables = new_state
-    console.log(new_state, Window.SugarVariables)
+    for (var member in Window.SugarCubeState.variables) delete Window.SugarCubeState.variables[member];
+    Window.SugarCubeState.variables.variables = new_state
+    console.log(new_state, Window.SugarCubeState.variables)
     $(document).trigger(":liveupdate");
 }
 

@@ -72,10 +72,20 @@ class Webstack {
 	async redisAtomicWrite(key, value) {
 		const script = `
 		redis.call('SET', '${key}', '${JSON.stringify(value)}')
+		redis.call('SADD', 'theyr', '${key}')
 		return redis.call('GET', '${key}')
 		`;
 		const newCount = await redis.eval(script, 0);
 		return newCount;
+	}
+
+	async redisAtomicGetKeys() {
+		const script = `
+		return redis.call('SMEMBERS', 'theyr')
+		`
+		const keys = await redis.eval(script, 0);
+		console.log("KEYSSSSS: ", keys);
+		return keys;
 	}
 	
 	initIO() {
@@ -83,17 +93,18 @@ class Webstack {
 			console.log(`connect_error due to ${err.message}`);
 		  });
 		io.on('connection', async (socket) => {
-			const keys = await redis.keys("*");
+			const keys = await this.redisAtomicGetKeys();
 			const state = {}
 			for (let key of keys) {
 				state[key] = await redis.get(key);
 			}
-			console.log(state);
 			// let gstate = this.serverStore.getState();
 			// User connects 
 			socket.once('new user', (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
-				if (typeof gstate !== 'undefined') {
+				console.log("connecting state: ", state);
+				
+				if (typeof state !== 'undefined') {
 					//console.log("gstate", JSON.stringify(gstate))
 					io.to(id).emit('new connection', state)
 				} else {
@@ -105,22 +116,30 @@ class Webstack {
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('difference', async (diff) => {
-				this.redisAtomicWrite("diff", diff);
 				for (const key in diff) {
-					this.redisAtomicWrite(`${key}`, diff[key]);
+					if (key !== "userId" && key !== "nick") {
+						await this.redisAtomicWrite(`${key}`, diff[key]);
+					}
 				}
 				console.log("diff: ", diff);
-				if(!Object.keys(diff).includes("theyrPrivateVars")) {
-					let returnDiff = {};
-					for (const key in diff) {
-						console.log("Getting data");
-						redis.get(`${key}`, (err, data) => {
-							if (data) {
-								returnDiff[key] = data;
-							}
-						})
+				let returnDiff = {};
+				const keys = await this.redisAtomicGetKeys();
+				for (let key of keys) {
+					console.log("Key: ", key);
+					if (key !== "userId" && key !== "theyrPrivateVars") {
+						let val = await redis.get(`${key}`);
+						if (val !== null) {
+							console.log("val: ", val);
+							val = JSON.parse(val);
+							console.log("Getting data: ", JSON.stringify(val));
+							returnDiff[key] = val;
+							console.log(returnDiff[key]);
+						}
 					}
-					console.log("Sending in diff");
+				}
+				console.log("Return diff: ", returnDiff);
+				if (Object.keys(returnDiff).length > 0) {
+					console.log("Sending in diff: ", returnDiff);
 					socket.broadcast.emit('difference', returnDiff);
 				}
 			});
