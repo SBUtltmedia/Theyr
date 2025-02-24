@@ -6,11 +6,14 @@ var gameVars;
 var lastStats = [];
 var buffer = [];
 var emitFlag = false;
+var prevState = [];
 
 function init() {
     // $('#passages').html($('#passages').html().replace(/<br><br>/gm, ""));
 
     console.log(Window.SugarCubeState.passage);
+    prevState = Object.assign({}, Window.SugarCubeState.variables);
+    console.log(prevState);
     $("body").addClass("blur")
     $("body").one("click", () => {
         $("body").removeClass("blur")
@@ -58,10 +61,14 @@ function createHandler(path = []) {
         },
         set(target, key, value) {
             if (target[key] != value) {
+                prevState = Object.assign({}, target);
                 target[key] = value
                 path.shift();
+
+                console.log(target, key, value);
+
                 // diffSet([...path, key], value);
-                emitNewVars(target);
+                emitNewVars(key, value);
             }
             return true
         }
@@ -99,10 +106,11 @@ function diffSet(pathArr, value) {
 
 }
 
-function emitNewVars(newState) {
-    if (emitFlag) {
-        console.log("new state: ", newState);
-        socket.emit('difference', newState);
+function emitNewVars(key, value) {
+    if (emitFlag && key !== "nick" && key !== "userId") {
+        let newState = {};
+        newState[key] = value;
+        socket.emit('newState', newState);
         $(document).trigger(":liveupdate");
     }
 }
@@ -120,6 +128,10 @@ function initTheyr(lockInfo) {
         lockInfo.callback(lockInfo.lockId);
         console.log("lockscreen unlocked");
     })
+
+    // socket.on('sendDiff', () => {
+    //     socket.emit("sendDiff");
+    // })
 
     socket.on('new connection', (state) => {
         // console.log("LOAD #2: RECEIEVE STATE");

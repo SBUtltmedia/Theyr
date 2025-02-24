@@ -16,20 +16,18 @@ const webstackInstance = new webstack(SERVERCONF)
 const { app } = webstackInstance.get();
 const htmlTemplate = 'login/index.html';
 
-
-
 // Listen for requests to the homepage
 app.get('/', async ({ query }, response) => {
 	//userData is info from discord
 	const userData = query;
 
 	if (userData.nick) {
-		return returnTwine({ gameState: webstackInstance.serverStore.getState()}, response);
-	}
-
-	else {
+		console.log("user data nick");
+		const gameState = await webstackInstance.redisGetState();
+		return returnTwine({ gameState: gameState}, response);
+	} else {
 		let htmlContents = fs.readFileSync(htmlTemplate, 'utf8')
-
+		console.log("html template");
 		response.send(htmlContents);
 	}
 });

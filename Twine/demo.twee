@@ -102,6 +102,7 @@ importScripts([
 <</if>>
 
 	<<liveblock>>
+	
 	$chatlog <br>
 	<</liveblock>>
 	<<textbox "_chattext" "" autofocus>> 
