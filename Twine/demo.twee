@@ -38,8 +38,8 @@ importScripts([
 	]	
 )
 	.then(function() {
-		State = new Proxy(State, createHandler())
 		initTheyr({lockId,callback:LoadScreen.unlock})
+		State = new Proxy(State, createHandler())
 	}
 );
 
@@ -97,18 +97,17 @@ importScripts([
 
 
 :: Chat {"position":"350,101","size":"100,100"}
-<<if ndef $chatlog >>
-<<set $chatlog= "Chat:">>
+<<if not $chatlog >>
+	<<set $chatlog= "Chat:">>
 <</if>>
 
-	<<liveblock>>
-	
-	$chatlog <br>
-	<</liveblock>>
-	<<textbox "_chattext" "" autofocus>> 
+<<liveblock>>
+$chatlog <br>
+<</liveblock>>
+<<textbox "_chattext" "" autofocus>> 
 
-	<<button "Continue">>
-		<<set $chatlog += "<br>" + $users[$userId]["nick"] + ": " + _chattext>>
-	<</button>>
+<<button "Continue">>
+	<<set $chatlog += "<br>" + $users[$userId]["nick"] + ": " + _chattext>>
+<</button>>
 
 

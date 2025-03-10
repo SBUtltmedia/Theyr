@@ -21,9 +21,24 @@ app.get('/', async ({ query }, response) => {
 	//userData is info from discord
 	const userData = query;
 
+    response.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.setHeader('Pragma', 'no-cache');
+    response.setHeader('Expires', '0');
+
 	if (userData.nick) {
-		console.log("user data nick");
 		const gameState = await webstackInstance.redisGetState();
+		for (let key of Object.keys(gameState)) {
+            let val = gameState[key];
+            let newVal;
+            try {
+                newVal = JSON.parse(val);
+            } catch (e) {
+                console.log("Couldn't parse val: ", val);
+                newVal = val;
+            }
+            gameState[key] = newVal;
+        }
+		console.log("user data nick: ", gameState);
 		return returnTwine({ gameState: gameState}, response);
 	} else {
 		let htmlContents = fs.readFileSync(htmlTemplate, 'utf8')

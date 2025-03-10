@@ -11,9 +11,9 @@ var prevState = [];
 function init() {
     // $('#passages').html($('#passages').html().replace(/<br><br>/gm, ""));
 
-    console.log(Window.SugarCubeState.passage);
-    prevState = Object.assign({}, Window.SugarCubeState.variables);
-    console.log(prevState);
+    // console.log(Window.SugarCubeState.passage);
+    // prevState = Object.assign({}, Window.SugarCubeState.variables);
+    // console.log(prevState);
     $("body").addClass("blur")
     $("body").one("click", () => {
         $("body").removeClass("blur")
@@ -26,6 +26,7 @@ $(document).on(':passagestart', (ev) => {
     init()
 
 })
+
 
 function fullReset() {
     console.log("reset start")
@@ -61,13 +62,10 @@ function createHandler(path = []) {
         },
         set(target, key, value) {
             if (target[key] != value) {
-                prevState = Object.assign({}, target);
+                // prevState = Object.assign({}, target);
+                console.log("set: ", key, value);
                 target[key] = value
                 path.shift();
-
-                console.log(target, key, value);
-
-                // diffSet([...path, key], value);
                 emitNewVars(key, value);
             }
             return true
@@ -75,50 +73,24 @@ function createHandler(path = []) {
     }
 }
 
-
-/**
- * Takes in a pathArr after proxy on setting SugarCubeState is triggered. Will create a difference object with the diffKey
-    as the key and it's new value after setting is done. 
-
-    Sends the emits difference with the diff object as the payload to notify serverstore to update
-
- * @param {Array} pathArr: path followed by proxy to get to value being set
- * @param {*} value: the new value of whatever is being set
- * @returns 
- */
-function diffSet(pathArr, value) {
-    //find new value after setting is done
-
-    //If an varible that has been labeled an exception is being set, stop
-    if (exceptions.includes(pathArr[0])) {
-        return;
-    }
-    let currKey;
-    let prevKey = value
-    while (pathArr.length > 0) {
-        currKey = { [pathArr.pop()]: prevKey };
-        prevKey = currKey;
-    }
-
-    console.log("diff:", currKey);
-    socket.emit('difference', currKey)
-    $(document).trigger(":liveupdate");
-
-}
-
 function emitNewVars(key, value) {
     if (emitFlag && key !== "nick" && key !== "userId") {
+        console.log(key, value);
         let newState = {};
         newState[key] = value;
+        userData.gameState[key] = value;
         socket.emit('newState', newState);
         $(document).trigger(":liveupdate");
     }
 }
 
 function initTheyr(lockInfo) {
-
-    updateSugarCubeState(userData.gameState);
-
+    $(document).on(":storyready", function() {
+        console.log("SugarCube has fully initialized!");
+        updateSugarCubeState(userData.gameState);
+        emitFlag = true;
+    });
+    
     socket = io();
     // Receive state from server upon connecting, then update all other clients that you've connected
     socket.on('connect', () => {
@@ -128,36 +100,6 @@ function initTheyr(lockInfo) {
         lockInfo.callback(lockInfo.lockId);
         console.log("lockscreen unlocked");
     })
-
-    // socket.on('sendDiff', () => {
-    //     socket.emit("sendDiff");
-    // })
-
-    socket.on('new connection', (state) => {
-        // console.log("LOAD #2: RECEIEVE STATE");
-        console.log("Connecting state:", state)
-        for (let key of Object.keys(state)) {
-            let val = state[key];
-            let newVal;
-            try {
-                newVal = JSON.parse(val);
-            } catch (e) {
-                console.log("Couldn't parse", e);
-                newVal = val;
-            }
-            state[key] = newVal;
-        }
-        // console.log("Current State:", Window.SugarCubeState.variables)
-        let newState = Object.assign({}, Window.SugarCubeState.variables, state);
-        updateSugarCubeState(newState);
-
-        emitFlag = true;
-        // console.log("Combined State", combinedState)
-        // If the server's state is empty, set with this client's state
-        //    updateSugarCubeState(combinedState);
-        $(document).trigger(":liveupdate");
-    });
-
     // Incoming difference, update your state and store
     socket.on('difference', (diff) => {
         console.log("got a difference");

@@ -83,21 +83,7 @@ class Webstack {
 			// User connects 
 			socket.on('new user', async (id) => {
 				console.log("SERVER RECEIVES NEW USER:", id);
-
 				this.socketClientMap.set(socket.id, id);
-				const keys = await this.redisAtomicGetKeys();
-				const state = {};
-				for (let key of keys) {
-					state[key] = await redis.get(key);
-				}
-				console.log("connecting state: ", state);
-				if (typeof state !== 'undefined') {
-					//console.log("gstate", JSON.stringify(gstate))
-					io.to(id).emit('new connection', state)
-				} else {
-					//console.log("Retrieving state from JSONFS", database.getData())
-					io.to(id).emit('new connection', {})
-				}
 			});
 
 			socket.on('disconnect', async () => {
@@ -117,22 +103,16 @@ class Webstack {
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('newState', async (diff) => {
-				console.log("Message from user: ", this.socketClientMap[socket.id], Date.now());
-				console.log("Diff: ", diff);
-
 				let keys = Object.keys(diff); // is always gonna be 1 key
 				let key = keys[0];
-
 				if (key !== "userId" && key !== "nick") {
 					let val = diff[key];
 					if (typeof val === 'object' && val !== null) {
 						val = JSON.stringify(val);
 					}
 					let reutrnState = await this.redisAtomicWrite(`${key}`, val);
-					console.log("key: ", key);
 					let returnObj = {};
 					returnObj[key] = reutrnState;
-					console.log("Return obj: ", returnObj);
 					socket.broadcast.emit('difference', returnObj);
 				} else if (key === "userId") {
 					this.socketClientMap[socket.id] = diff[key];
