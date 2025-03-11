@@ -1,0 +1,34 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - kai_dev
+  pull_request:
+    branches:
+      - kai_dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the code from your repo
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Set up Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14' # Use the desired Node.js version
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        npm install
+
+    # Run tests using Mocha
+    - name: Run Mocha tests
+      run: |
+        npm test
