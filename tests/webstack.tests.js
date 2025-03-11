@@ -91,7 +91,8 @@ describe('Webstack Server Tests', function () {
         });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
-            const numClients = 100;
+            const numClients = 500;
+            const numMessages = 10;
             
             const socketPromises = [];
             let receivedMessages = [];
@@ -140,12 +141,14 @@ describe('Webstack Server Tests', function () {
                             socketMsg.set(socket.id, msgs);
 
 
-                            if (responses === numClients - 1) {
+                            if (responses === numMessages * (numClients - 1)) {
                                 resolve();
                             }
                         });
 
-                        socket.emit('newState', { chatlog: `${i}` });
+                        for (let j = 0; j < numMessages; j++) {
+                            socket.emit('newState', { chatlog: `${i}_${j}` });
+                        }
                     }));
                     i++;
                 }
@@ -157,13 +160,13 @@ describe('Webstack Server Tests', function () {
                     const mpToObj = Object.fromEntries(socketMsg);
                     fs.writeFileSync('mapData.json', JSON.stringify(mpToObj, null, 2));
                     console.log("Key len: ", socketMsg.size);
-                    expect(receivedMessages).to.have.lengthOf(numClients * (numClients - 1));
+                    expect(receivedMessages).to.have.lengthOf(numMessages * numClients * (numClients - 1));
                     for (let key of socketMsg.keys()) {
                         let data = socketMsg.get(key);
-                        expect(data).to.have.lengthOf(numClients - 1);
+                        expect(data).to.have.lengthOf(numMessages * (numClients - 1));
                     }
-                    console.log(`${numClients} clients with ${numClients * (numClients - 1)} messages served in: ${timeDifference} milliseconds`);
-                    console.log(`${numClients * (numClients - 1) * 1000 / timeDifference} messages processed in: 1 second`);                    
+                    console.log(`${numClients} clients with ${numMessages * numClients * (numClients - 1)} messages served in: ${timeDifference} milliseconds`);
+                    console.log(`${numMessages * numClients * (numClients - 1) * 1000 / timeDifference} messages processed in: 1 second`);                    
                     done();                 
                 }).catch((err) => {
                     console.error("Promise.all failed with error:", err);
