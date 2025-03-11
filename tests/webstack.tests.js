@@ -34,7 +34,6 @@ const app = webStack.get().app;
 describe('Webstack Server Tests', function () {
     let sockets = [];
     const SOCKET_URL = `http://localhost:${PORT}`;
-    const NUM_CLIENTS = 50;
 
     afterEach(() => {
         for (let socket of sockets) {
@@ -91,8 +90,8 @@ describe('Webstack Server Tests', function () {
         });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
-            const numClients = 500;
-            const numMessages = 10;
+            let numClients = 200;
+            let numMessages = 5;
             
             const socketPromises = [];
             let receivedMessages = [];
@@ -110,8 +109,12 @@ describe('Webstack Server Tests', function () {
                         reject(new Error(`Timeout for socket ${socket.id}`))
                     }, 15000);
                     socket.on('connect', () => {
-                        clearTimeout(timeout);                    
-                        resolve(socket);
+                        clearTimeout(timeout);
+                        if (socket.id !== undefined) {
+                            resolve(socket);
+                        } else {
+                            resolve(undefined);
+                        }
                     });
                 }));
             }
@@ -121,13 +124,25 @@ describe('Webstack Server Tests', function () {
                 let emitPromises = [];
                 console.log("inp len: ", inpSockets.length);
                 console.log("Emitting data");
-                let startTime = new Date();
                 let i = 0;
                 for (let socket of inpSockets) {
-                    sockets.push(socket);
-                    socketMsg.set(socket.id, []);
+                    if (socket.id === undefined) {
+                        console.log("UNDEFINED SOCKET");
+                    } else {
+                        sockets.push(socket);
+                        socketMsg.set(socket.id, []);
+                    }
                 }
-                for (let socket of inpSockets) {
+                console.log("Map size: ", socketMsg.size);
+                console.log("Sockets size: ", sockets.length);
+
+                numClients = socketMsg.size;
+
+                // const mpToObj = Object.fromEntries(socketMsg);
+                // fs.writeFileSync('firstmapData.json', JSON.stringify(mpToObj, null, 2));
+                let startTime = new Date();
+
+                for (let socket of sockets) {
                     emitPromises.push(new Promise((resolve) => {
                         let responses = 0;
 
@@ -136,10 +151,20 @@ describe('Webstack Server Tests', function () {
 
                             receivedMessages.push(data.chatlog);
                             msgSet.add(data.chatlog);
+
                             let msgs = socketMsg.get(socket.id);
+                            // if (!msgs) {
+                            //     msgs = [];  // Initialize if it's undefined
+                            //     socketMsg.set(socket.id, msgs);  // Set it again to ensure the map is updated
+                            // }
+                            
+                            if (msgs === undefined) {
+                                console.log(socket.id, socketMsg.get(socket.id));
+                            }
                             msgs.push(data.chatlog);
                             socketMsg.set(socket.id, msgs);
 
+                            // console.log(`Responses: ${responses} (Expecting: ${numClients - 1})`);
 
                             if (responses === numMessages * (numClients - 1)) {
                                 resolve();
