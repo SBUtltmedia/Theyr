@@ -34,9 +34,7 @@ class Webstack {
 		this.socketClientMap = new Map();
 		this.initIO();
 
-		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`)
-		
-		)
+		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`))
 		console.log("port exists")
 
 	}
@@ -45,6 +43,10 @@ class Webstack {
 		return {
 			app
 		}
+	}
+
+	getHTTP() {
+		return http;
 	}
 
 	async redisAtomicWrite(key, value) {
@@ -97,7 +99,7 @@ class Webstack {
 						await this.redisAtomicWrite("users", JSON.stringify(users));
 					}
 				}
-				console.log("User disconnected: ", userID);
+				// console.log("User disconnected");
 			})			
 
 			// When a client detects a variable being changed they send the difference signal which is
@@ -110,9 +112,10 @@ class Webstack {
 					if (typeof val === 'object' && val !== null) {
 						val = JSON.stringify(val);
 					}
-					let reutrnState = await this.redisAtomicWrite(`${key}`, val);
 					let returnObj = {};
+					let reutrnState = await this.redisAtomicWrite(`${key}`, val);
 					returnObj[key] = reutrnState;
+					// console.log("onj: ", returnObj);
 					socket.broadcast.emit('difference', returnObj);
 				} else if (key === "userId") {
 					this.socketClientMap[socket.id] = diff[key];

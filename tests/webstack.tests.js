@@ -31,46 +31,33 @@ const SERVERCONF = { "port": PORT, "twinePath": TWINE_PATH, "fileName": FILENAME
 const webStack =  new Webstack(SERVERCONF);
 const app = webStack.get().app;
 
-const request = supertest(app);
-
-// Test Suite for Webstack
 describe('Webstack Server Tests', function () {
-    let socket1, socket2, socket3;
+    let sockets = [];
     const SOCKET_URL = `http://localhost:${PORT}`;
     const NUM_CLIENTS = 50;
 
-    before((done) => {
-        // Initialize WebSocket clients before tests
-        socket1 = io.connect(SOCKET_URL);
-        socket2 = io.connect(SOCKET_URL);
-        socket3 = io.connect(SOCKET_URL);
-
-        let connectedSockets = 0;
-
-        // Increment counter when each socket connects
-        const checkConnections = () => {
-            connectedSockets += 1;
-            if (connectedSockets === 3) { // Check if all three sockets are connected
-                done(); // Only call done once all sockets are connected
-            }
-        };
-
-        // Listen for the 'connect' event on each socket
-        socket1.on('connect', checkConnections);
-        socket2.on('connect', checkConnections);
-        socket3.on('connect', checkConnections);
-    });
-
     afterEach(() => {
-        // Disconnect all sockets after each test to avoid leaks
-        socket1.disconnect();
-        socket2.disconnect();
-        socket3.disconnect();
+        for (let socket of sockets) {
+            socket.disconnect();
+        }
     });
-    // WebSocket Concurrency Tests
+
+    this.afterAll(() => {
+        webStack.getHTTP().close(() => {
+            console.log("Server closed");
+        });
+    })
+
     describe('WebSocket Concurrency Tests', function () {
         it('should allow multiple clients to emit and receive messages simultaneously', function (done) {
             const messages = [];
+            let socket1 = io.connect(SOCKET_URL);
+            let socket2 = io.connect(SOCKET_URL);
+            let socket3 = io.connect(SOCKET_URL);
+
+            sockets.push(socket1);
+            sockets.push(socket2);
+            sockets.push(socket3);
 
             socket1.emit('newState', { chatlog: 'Message from user1' });
             socket2.emit('newState', { chatlog: 'Message from user2' });
@@ -88,7 +75,6 @@ describe('Webstack Server Tests', function () {
 
             // Wait for all messages to be received and verify order
             setTimeout(() => {
-                console.log("Messages: ", messages);
                 expect(messages).to.have.members([
                     'Message from user1',
                     'Message from user1',
@@ -96,8 +82,6 @@ describe('Webstack Server Tests', function () {
                     'Message from user2',
                     'Message from user3',
                     'Message from user3'
-                    // 'Message from user1Message from user2',
-                    // 'Message from user1Message from user2Message from user3'
                 ]);
                 done();
             }, 1000);
@@ -106,7 +90,6 @@ describe('Webstack Server Tests', function () {
         it('should handle many concurrent socket emits and updates correctly', function (done) {
             const messages = [];
             let msgSet = new Set();
-            const sockets = [];
             for (let i = 0; i < NUM_CLIENTS; i++) {
                 const socket = io.connect(SOCKET_URL);
                 socket.on('connect', () => {
@@ -129,58 +112,69 @@ describe('Webstack Server Tests', function () {
         });
 
         it('should ensure proper message ordering for multiple concurrent clients', function (done) {
-            const numMessages = 10;
+            const numClients = 1000;
+            
             const socketPromises = [];
             let receivedMessages = [];
-            for (let i = 0; i < numMessages; i++) {
+            let socketMsg = new Map();
+            let msgSet = new Set();
+
+            for (let i = 0; i < numClients; i++) {
                 const socket = io.connect(SOCKET_URL);
-                socketPromises.push(new Promise((resolve) => {
+                sockets.push(socket);
+                socketPromises.push(new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        console.log(`Timeout for connecting socket ${socket.id}: `, socketMsg.get(socket.id));
+                        reject(new Error(`Timeout for socket ${socket.id}`))
+                    }, 15000);
                     socket.on('connect', () => {
-                        socket.emit('newState', { chatlog: `Message ${i}` });
-                    });
-                    socket.on('difference', (data) => {
-                        receivedMessages.push(data.chatlog);
-                        resolve();
+                        clearTimeout(timeout);
+                        // socket.emit('newState', { chatlog: `${i}` });
+                        socketMsg.set(socket.id, []);
+                        resolve(socket);
                     });
                 }));
             }
 
-            Promise.all(socketPromises).then(() => {
-                setTimeout(() => {
-                    console.log("Rec msg: ", receivedMessages);
-                    // Check if the received messages match the sent messages
-                    expect(receivedMessages).to.have.members(
-                        Array.from({ length: numMessages * (numMessages - 1) }, (_, index) => `Message ${Math.floor(index/(numMessages - 1))}`)
-                    );
-                    done();
-                }, 1000);
-            });
-        });
-    });
+            Promise.all(socketPromises).then((connectedSockets) => {
+                let emitPromises = [];
+                for (let i = 0; i < numClients; i++) {
+                    connectedSockets[i].on('difference', (data) => {
+                        receivedMessages.push(data.chatlog);
+                        msgSet.add(data.chatlog);
+                        let msgs = socketMsg.get(connectedSockets[i].id);
+                        msgs.push(data.chatlog);
+                        socketMsg.set(connectedSockets[i].id, msgs);
+                    });
+                }
 
-    // Stress Test: Simulate multiple connections
-    describe('Stress Tests', function () {
-        it('should handle many concurrent connections without failure', function (done) {
-            this.timeout(10000);
-            const numClients = 500;
-            const socketPromises = [];
-            for (let i = 0; i < numClients; i++) {
-                socketPromises.push(
-                    new Promise((resolve) => {
-                        const socket = io.connect(SOCKET_URL);
-                        socket.on('connect', () => {
-                            socket.emit('newState', { chatlog: `Stress Test Message ${i}` });
-                            socket.on('difference', (data) => {
-                                expect(data.chatlog).to.equal(`Stress Test Message ${i}`);
-                                resolve();
-                            });
-                        });
-                    })
-                );
-            }
+                for (let i = 0; i < numClients; i++) {
+                    emitPromises.push(new Promise((resolve) => {
+                        connectedSockets[i].emit('newState', { chatlog: `${i}` });
+                        resolve();
+                    }));                    
+                }
 
-            Promise.all(socketPromises).then(() => {
-                done();
+                Promise.all(emitPromises).then(() => {
+                    setTimeout(() => {
+                        // console.log(socketMsg);
+                        expect(receivedMessages).to.have.lengthOf(numClients * (numClients - 1));
+                        for (let key of socketMsg.keys()) {
+                            let data = socketMsg.get(key);
+                            let sortedData = data.sort((a, b) => a - b);
+                            expect(data).to.have.deep.equals(sortedData);
+                        }
+                        done();
+                    }, 20000);                    
+                }).catch((err) => {
+                    console.error("Promise.all failed with error:", err);
+                    console.log(msgSet, msgSet.size);
+                    done(err);
+                });
+            }).catch((err) => {
+                console.error("Promise.all failed with error:", err);
+                console.log(msgSet, msgSet.size);
+                done(err);
             });
         });
     });
