@@ -3,3 +3,4 @@ loginDiscord/configHerokuInstances.json
 node_modules
 tests.js
 jsonFS/data/**
+mapData.json

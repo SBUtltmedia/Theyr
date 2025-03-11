@@ -49,6 +49,10 @@ class Webstack {
 		return http;
 	}
 
+	getRedis() {
+		return redis;
+	}
+
 	async redisAtomicWrite(key, value) {
 		const script = `
 			redis.call('SET', KEYS[1], ARGV[1])

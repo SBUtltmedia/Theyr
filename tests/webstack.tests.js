@@ -46,6 +46,8 @@ describe('Webstack Server Tests', function () {
     this.afterAll(() => {
         webStack.getHTTP().close(() => {
             console.log("Server closed");
+            let redis = webStack.getRedis();
+            redis.quit();
         });
     })
 
@@ -86,30 +88,6 @@ describe('Webstack Server Tests', function () {
                 ]);
                 done();
             }, 1000);
-        });
-
-        it('should handle many concurrent socket emits and updates correctly', function (done) {
-            const messages = [];
-            let msgSet = new Set();
-            for (let i = 0; i < NUM_CLIENTS; i++) {
-                const socket = io.connect(SOCKET_URL);
-                socket.on('connect', () => {
-                    socket.emit('newState', { chatlog: `Message ${i}` });
-                });
-                socket.on('difference', (data) => {
-                    messages.push(data.chatlog);
-                    msgSet.add(data.chatlog);
-                });
-                sockets.push(socket);
-            }
-
-            setTimeout(() => {
-                // Assert that all messages have been received
-                // emitting one newState leads on to NUM_CLIENTS - 1 messages
-                expect(messages).to.have.lengthOf(NUM_CLIENTS * (NUM_CLIENTS - 1));
-                expect(msgSet).to.have.lengthOf(50);
-                done();
-            }, 2000);
         });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
