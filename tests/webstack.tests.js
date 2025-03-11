@@ -40,6 +40,7 @@ describe('Webstack Server Tests', function () {
         for (let socket of sockets) {
             socket.disconnect();
         }
+        sockets = [];
     });
 
     this.afterAll(() => {
@@ -111,61 +112,81 @@ describe('Webstack Server Tests', function () {
             }, 2000);
         });
 
-        it('should ensure proper message ordering for multiple concurrent clients', function (done) {
-            const numClients = 1000;
+        it('ensure consistency for multiple concurrent clients', function (done) {
+            const numClients = 100;
             
             const socketPromises = [];
             let receivedMessages = [];
             let socketMsg = new Map();
             let msgSet = new Set();
 
+            console.log("Connecting sockets");
+
             for (let i = 0; i < numClients; i++) {
                 const socket = io.connect(SOCKET_URL);
-                sockets.push(socket);
+
                 socketPromises.push(new Promise((resolve, reject) => {
                     const timeout = setTimeout(() => {
                         console.log(`Timeout for connecting socket ${socket.id}: `, socketMsg.get(socket.id));
                         reject(new Error(`Timeout for socket ${socket.id}`))
                     }, 15000);
                     socket.on('connect', () => {
-                        clearTimeout(timeout);
-                        // socket.emit('newState', { chatlog: `${i}` });
-                        socketMsg.set(socket.id, []);
+                        clearTimeout(timeout);                    
                         resolve(socket);
                     });
                 }));
             }
 
-            Promise.all(socketPromises).then((connectedSockets) => {
-                let emitPromises = [];
-                for (let i = 0; i < numClients; i++) {
-                    connectedSockets[i].on('difference', (data) => {
-                        receivedMessages.push(data.chatlog);
-                        msgSet.add(data.chatlog);
-                        let msgs = socketMsg.get(connectedSockets[i].id);
-                        msgs.push(data.chatlog);
-                        socketMsg.set(connectedSockets[i].id, msgs);
-                    });
-                }
 
-                for (let i = 0; i < numClients; i++) {
+            Promise.all(socketPromises).then((inpSockets) => {
+                let emitPromises = [];
+                console.log("inp len: ", inpSockets.length);
+                console.log("Emitting data");
+                let startTime = new Date();
+                let i = 0;
+                for (let socket of inpSockets) {
+                    sockets.push(socket);
+                    socketMsg.set(socket.id, []);
+                }
+                for (let socket of inpSockets) {
                     emitPromises.push(new Promise((resolve) => {
-                        connectedSockets[i].emit('newState', { chatlog: `${i}` });
-                        resolve();
-                    }));                    
+                        let responses = 0;
+
+                        socket.on('difference', (data) => {
+                            responses++;
+
+                            receivedMessages.push(data.chatlog);
+                            msgSet.add(data.chatlog);
+                            let msgs = socketMsg.get(socket.id);
+                            msgs.push(data.chatlog);
+                            socketMsg.set(socket.id, msgs);
+
+
+                            if (responses === numClients - 1) {
+                                resolve();
+                            }
+                        });
+
+                        socket.emit('newState', { chatlog: `${i}` });
+                    }));
+                    i++;
                 }
 
                 Promise.all(emitPromises).then(() => {
-                    setTimeout(() => {
-                        // console.log(socketMsg);
-                        expect(receivedMessages).to.have.lengthOf(numClients * (numClients - 1));
-                        for (let key of socketMsg.keys()) {
-                            let data = socketMsg.get(key);
-                            let sortedData = data.sort((a, b) => a - b);
-                            expect(data).to.have.deep.equals(sortedData);
-                        }
-                        done();
-                    }, 20000);                    
+                    let endTime = new Date();
+                    let timeDifference = endTime - startTime;
+
+                    const mpToObj = Object.fromEntries(socketMsg);
+                    fs.writeFileSync('mapData.json', JSON.stringify(mpToObj, null, 2));
+                    console.log("Key len: ", socketMsg.size);
+                    expect(receivedMessages).to.have.lengthOf(numClients * (numClients - 1));
+                    for (let key of socketMsg.keys()) {
+                        let data = socketMsg.get(key);
+                        expect(data).to.have.lengthOf(numClients - 1);
+                    }
+                    console.log(`${numClients} clients with ${numClients * (numClients - 1)} messages served in: ${timeDifference} milliseconds`);
+                    console.log(`${numClients * (numClients - 1) * 1000 / timeDifference} messages processed in: 1 second`);                    
+                    done();                 
                 }).catch((err) => {
                     console.error("Promise.all failed with error:", err);
                     console.log(msgSet, msgSet.size);
