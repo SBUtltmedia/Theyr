@@ -90,8 +90,8 @@ describe('Webstack Server Tests', function () {
         });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
-            let numClients = 200;
-            let numMessages = 5;
+            let numClients = 500;
+            let numMessages = 1;
             
             const socketPromises = [];
             let receivedMessages = [];

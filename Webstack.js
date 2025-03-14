@@ -34,6 +34,9 @@ class Webstack {
 		this.socketClientMap = new Map();
 		this.initIO();
 
+		// set well_coincount
+		this.redisAtomicWrite("well_coincount", 100000);
+
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`))
 		console.log("port exists")
 

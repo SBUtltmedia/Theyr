@@ -84,15 +84,30 @@ importScripts([
 <<if ndef $users >>
 <<set $users={}>>
 <</if>>
-
+/* <<if ndef $well_coincount >>
+<<set $well_coincount=100000>>
+<</if>> */
 <<set _searchParams = new URLSearchParams(location.search) >>
 
 <<set $userId=_searchParams.get('id') || userData.authData.id >>
+<<script>>
 
+	const parseHash = () => {
+		let 
+	}
+
+
+	window.addEventListener(
+	"hashchange", parseHash);
+<</script>>
 
 <<if ndef $users[$userId]>>
+	
 	<<set $users[$userId] = {}>>
 	<<set $users[$userId]["nick"]=_searchParams.get('nick') || userData.authData.nick>>
+	<<set $users[$userId]["wallet"]=0>>
+	<<set $well_coincount = userData.well_coincount>>
+
 <</if>>
 
 
@@ -102,12 +117,22 @@ importScripts([
 <</if>>
 
 <<liveblock>>
-$chatlog <br>
+Well cointcount: $well_coincount <br>
+Wallet: <<print $users[$userId]["wallet"]>> <br>
 <</liveblock>>
+
 <<textbox "_chattext" "" autofocus>> 
 
-<<button "Continue">>
-	<<set $chatlog += "<br>" + $users[$userId]["nick"] + ": " + _chattext>>
+<div id="take">
+<<button  "Take">>
+	<<set $well_coincount -= 1>>
+	<<set $users[$userId]["wallet"] += 1>>
 <</button>>
+</div>
 
-
+<div id="give">
+<<button  "Give">>
+	<<set $well_coincount += 1>>
+	<<set $users[$userId]["wallet"] -= 1>>
+<</button>>
+</div>

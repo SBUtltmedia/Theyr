@@ -27,7 +27,6 @@ $(document).on(':passagestart', (ev) => {
 
 })
 
-
 function fullReset() {
     console.log("reset start")
     socket.emit('fullReset', '');
