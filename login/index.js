@@ -69,3 +69,5 @@ function returnTwine(userData, response) {
 	let fileContents = fs.readFileSync(file)
 	return response.send(`${fileContents} ${userDataScript}`);
 }
+
+export {app, webstackInstance};

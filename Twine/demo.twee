@@ -90,16 +90,6 @@ importScripts([
 <<set _searchParams = new URLSearchParams(location.search) >>
 
 <<set $userId=_searchParams.get('id') || userData.authData.id >>
-<<script>>
-
-	const parseHash = () => {
-		let 
-	}
-
-
-	window.addEventListener(
-	"hashchange", parseHash);
-<</script>>
 
 <<if ndef $users[$userId]>>
 	
@@ -117,7 +107,7 @@ importScripts([
 <</if>>
 
 <<liveblock>>
-Well cointcount: $well_coincount <br>
+Well coincount: $well_coincount <br>
 Wallet: <<print $users[$userId]["wallet"]>> <br>
 <</liveblock>>
 
@@ -136,3 +126,5 @@ Wallet: <<print $users[$userId]["wallet"]>> <br>
 	<<set $users[$userId]["wallet"] -= 1>>
 <</button>>
 </div>
+
+

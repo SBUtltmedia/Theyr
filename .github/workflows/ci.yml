@@ -34,7 +34,11 @@ jobs:
         sudo apt-get install redis-server -y
         sudo systemctl start redis-server        
 
-    # Run tests using Mocha
-    - name: Run Mocha tests
+    - name: Run server tests
       run: |
-        npm test
+        npm run test_backend
+
+    # Run tests using Mocha
+    - name: Run UI tests
+      run: |
+        npm run test_ui

@@ -5,7 +5,9 @@
   "scripts": {
     "start": "npx nodemon login/",
     "dev": "npx nodemon login/",
-    "test": "npx mocha ./tests/webstack.tests.js --timeout 170000"
+    "test_backend": "npx mocha ./tests/webstack.tests.js --timeout 170000 --exit",
+    "test_ui": "npx mocha ./tests/ui.tests.js --timeout 170000 --exit"
+
   },
   "keywords": [
     "node",
@@ -29,6 +31,7 @@
     "mongoose": "^6.0.12",
     "node-fetch": "^3.2.0",
     "nodemon": "^2.0.15",
+    "puppeteer": "^24.4.0",
     "redux": "^4.1.2",
     "socket.io": "^4",
     "string-hex": "^1.0.0",

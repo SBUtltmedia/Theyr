@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import supertest from 'supertest';
 import io from 'socket.io-client';
-import Webstack from '../Webstack.js'; // Adjust the path
+import Webstack from '../Webstack.js';
 import http from 'http';
 import { createRequire } from 'module';
 import { fileURLToPath } from 'url';

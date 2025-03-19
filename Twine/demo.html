@@ -163,16 +163,6 @@ importScripts([
 &lt;&lt;set _searchParams = new URLSearchParams(location.search) &gt;&gt;
 
 &lt;&lt;set $userId=_searchParams.get(&#39;id&#39;) || userData.authData.id &gt;&gt;
-&lt;&lt;script&gt;&gt;
-
-	const parseHash = () =&gt; {
-		let 
-	}
-
-
-	window.addEventListener(
-	&quot;hashchange&quot;, parseHash);
-&lt;&lt;/script&gt;&gt;
 
 &lt;&lt;if ndef $users[$userId]&gt;&gt;
 	
@@ -186,7 +176,7 @@ importScripts([
 &lt;&lt;/if&gt;&gt;
 
 &lt;&lt;liveblock&gt;&gt;
-Well cointcount: $well_coincount &lt;br&gt;
+Well coincount: $well_coincount &lt;br&gt;
 Wallet: &lt;&lt;print $users[$userId][&quot;wallet&quot;]&gt;&gt; &lt;br&gt;
 &lt;&lt;/liveblock&gt;&gt;
 

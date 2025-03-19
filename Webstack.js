@@ -1,6 +1,8 @@
 import express from 'express';
-import Redux from 'redux'
 import { createRequire } from "module";
+import { fileURLToPath } from 'url';
+import path from 'path';
+
 const require = createRequire(import.meta.url);
 const app = express();
 const http = require('http').Server(app);
@@ -13,14 +15,6 @@ const redis = new Redis({
 	host: '127.0.0.1',
 	port: 6379
 });
-
-const INTERVAL_MS = 75;
-
-// io.on('connect', (socket) => {
-// 	console.log("A client connected: ", socket.id);
-
-// 	socket.on
-// })
 
 class Webstack {
 	constructor(serverConf) {
@@ -36,6 +30,17 @@ class Webstack {
 
 		// set well_coincount
 		this.redisAtomicWrite("well_coincount", 100000);
+
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+
+        // Serve static files from 'login/' directory
+        // app.use(express.static(path.join(__dirname, 'login')));
+
+        // // Default route to serve index.html if exists
+        // app.get('/', (req, res) => {
+        //     res.sendFile(path.join(__dirname, 'login', 'index.html'));
+        // });		
 
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`))
 		console.log("port exists")
@@ -96,17 +101,7 @@ class Webstack {
 			});
 
 			socket.on('disconnect', async () => {
-				let userID = this.socketClientMap.get(socket.id);
-				if (userID !== null && userID !== undefined && this.socketClientMap.has(userID)) {
-					this.socketClientMap.delete(socket.id);
-					let users = await redis.get("users");
-					if (users !== null && users !== undefined) {
-						users = JSON.parse(users);
-						delete users[userID];
-						await this.redisAtomicWrite("users", JSON.stringify(users));
-					}
-				}
-				// console.log("User disconnected");
+				console.log("User disconnected: ", socket.id);
 			})			
 
 			// When a client detects a variable being changed they send the difference signal which is
