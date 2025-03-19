@@ -21,11 +21,15 @@ describe('Web Server', function () {
     });
 
     this.afterAll(async () => {
-        webstackInstance.getHTTP().close(() => {
-            console.log("Server closed");
-            let redis = webstackInstance.getRedis();
-            redis.quit();
-        });
+        let http = webstackInstance.getHTTP();
+        if (http !== undefined) {
+            http.close(() => {
+                console.log("Server closed");
+                let redis = webstackInstance.getRedis();
+                if (redis !== undefined)
+                    redis.quit();
+            });
+        }
         await browser.close();
     });
 
