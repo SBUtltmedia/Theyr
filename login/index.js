@@ -26,7 +26,7 @@ app.get('/', async ({ query }, response) => {
     response.setHeader('Expires', '0');
 
 	if (userData.nick) {
-		const gameState = await webstackInstance.redisGetState();
+		const gameState = webstackInstance.state;
 		console.log(gameState);
 		for (let key of Object.keys(gameState)) {
             let val = gameState[key];

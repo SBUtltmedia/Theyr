@@ -10,12 +10,6 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const _ = require("lodash"); 
 var base64 = require('js-base64');
-const Redis = require('ioredis');
-
-const redis = new Redis({
-	host: process.env.REDIS_HOST || '127.0.0.1',
-	port: process.env.REDIS_PORT || 6379
-});
 
 class Webstack {
 	constructor(serverConf) {
@@ -60,10 +54,6 @@ class Webstack {
 	getHTTP() {
 		return http;
 	}
-
-	getRedis() {
-		return redis;
-	}
 	
 	initIO() {
 		io.on("connect_error", (err) => {
@@ -95,7 +85,6 @@ class Webstack {
 							val = JSON.stringify(val);
 						}
 						let returnObj = {};
-						// let reutrnState = await this.redisAtomicWrite(`${key}`, val);
 						this.state[`${key}`] = val;
 						returnObj[key] = val;
 						// console.log("onj: ", returnObj);
@@ -114,7 +103,6 @@ class Webstack {
 
 			socket.on('fullReset', ()=>{
 				console.log("reset start 2")
-				// TODO: Flush redis db?
 				// this.serverStore.dispatch({
 				// 	type: 'REPLACE',
 				// 	payload: {}
