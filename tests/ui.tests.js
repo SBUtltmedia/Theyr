@@ -13,6 +13,9 @@ describe('Web Server', function () {
     this.beforeEach(async() => {
         browser = await puppeteer.launch({
             headless: true,
+            defaultViewport: null,
+            executablePath: '/usr/bin/google-chrome',
+            args: ['--no-sandbox'],            
             slowMo: 50 // slow down operations for easier debugging
         });
 

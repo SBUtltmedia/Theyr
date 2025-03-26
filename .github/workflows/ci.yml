@@ -12,33 +12,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis:alpine
+        ports:
+          - 6378:6379    
+
     steps:
     # Checkout the code from your repo
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # Set up Node.js environment
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '22.14.0' # Use the desired Node.js version
-
-    # Install dependencies
-    - name: Install dependencies
+    - name: Set up environment variables
       run: |
-        npm install
+        echo "REDIS_HOST=redis" >> $GITHUB_ENV
+        echo "REDIS_PORT=6379" >> $GITHUB_ENV
 
-    - name: Install Redis
+    - name: Build and run tests with Docker Compose
       run: |
-        sudo apt-get update
-        sudo apt-get install redis-server -y
-        sudo systemctl start redis-server        
-
-    - name: Run server tests
+        docker-compose up --abort-on-container-exit --exit-code-from tests
+    
+    - name: Clean up Docker
       run: |
-        npm run test_backend
-
-    # Run tests using Mocha
-    - name: Run UI tests
-      run: |
-        npm run test_ui
+        docker-compose down

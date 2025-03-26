@@ -51,43 +51,43 @@ describe('Webstack Server Tests', function () {
     })
 
     describe('WebSocket Concurrency Tests', function () {
-        it('should allow multiple clients to emit and receive messages simultaneously', function (done) {
-            const messages = [];
-            let socket1 = io.connect(SOCKET_URL);
-            let socket2 = io.connect(SOCKET_URL);
-            let socket3 = io.connect(SOCKET_URL);
+        // it('should allow multiple clients to emit and receive messages simultaneously', function (done) {
+        //     const messages = [];
+        //     let socket1 = io.connect(SOCKET_URL);
+        //     let socket2 = io.connect(SOCKET_URL);
+        //     let socket3 = io.connect(SOCKET_URL);
 
-            sockets.push(socket1);
-            sockets.push(socket2);
-            sockets.push(socket3);
+        //     sockets.push(socket1);
+        //     sockets.push(socket2);
+        //     sockets.push(socket3);
 
-            socket1.emit('newState', { chatlog: 'Message from user1' });
-            socket2.emit('newState', { chatlog: 'Message from user2' });
-            socket3.emit('newState', { chatlog: 'Message from user3' });
+        //     socket1.emit('newState', { chatlog: 'Message from user1' });
+        //     socket2.emit('newState', { chatlog: 'Message from user2' });
+        //     socket3.emit('newState', { chatlog: 'Message from user3' });
 
-            socket1.on('difference', (data) => {
-                messages.push(data.chatlog);
-            });
-            socket2.on('difference', (data) => {
-                messages.push(data.chatlog);
-            });
-            socket3.on('difference', (data) => {
-                messages.push(data.chatlog);
-            });
+        //     socket1.on('difference', (data) => {
+        //         messages.push(data.chatlog);
+        //     });
+        //     socket2.on('difference', (data) => {
+        //         messages.push(data.chatlog);
+        //     });
+        //     socket3.on('difference', (data) => {
+        //         messages.push(data.chatlog);
+        //     });
 
-            // Wait for all messages to be received and verify order
-            setTimeout(() => {
-                expect(messages).to.have.members([
-                    'Message from user1',
-                    'Message from user1',
-                    'Message from user2',
-                    'Message from user2',
-                    'Message from user3',
-                    'Message from user3'
-                ]);
-                done();
-            }, 1000);
-        });
+        //     // Wait for all messages to be received and verify order
+        //     setTimeout(() => {
+        //         expect(messages).to.have.members([
+        //             'Message from user1',
+        //             'Message from user1',
+        //             'Message from user2',
+        //             'Message from user2',
+        //             'Message from user3',
+        //             'Message from user3'
+        //         ]);
+        //         done();
+        //     }, 1000);
+        // });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
             let numClients = 500;

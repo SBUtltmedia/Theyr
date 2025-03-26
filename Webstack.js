@@ -12,8 +12,8 @@ var base64 = require('js-base64');
 const Redis = require('ioredis');
 
 const redis = new Redis({
-	host: '127.0.0.1',
-	port: 6379
+	host: process.env.REDIS_HOST || '127.0.0.1',
+	port: process.env.REDIS_PORT || 6379
 });
 
 class Webstack {
@@ -101,7 +101,7 @@ class Webstack {
 			});
 
 			socket.on('disconnect', async () => {
-				console.log("User disconnected: ", socket.id);
+				// console.log("User disconnected: ", socket.id);
 			})			
 
 			// When a client detects a variable being changed they send the difference signal which is

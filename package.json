@@ -6,7 +6,8 @@
     "start": "npx nodemon login/",
     "dev": "npx nodemon login/",
     "test_backend": "npx mocha ./tests/webstack.tests.js --timeout 170000 --exit",
-    "test_ui": "npx mocha ./tests/ui.tests.js --timeout 170000 --exit"
+    "test_ui": "npx mocha ./tests/ui.tests.js --timeout 170000 --exit",
+    "test": "npx mocha ./tests/webstack.tests.js --timeout 170000 --exit && npx mocha ./tests/ui.tests.js --timeout 170000 --exit"
 
   },
   "keywords": [
