@@ -23,10 +23,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up environment variables
-      run: |
-        echo "REDIS_HOST=redis" >> $GITHUB_ENV
-        echo "REDIS_PORT=6379" >> $GITHUB_ENV
+    # - name: Set up environment variables
+    #   run: |
+    #     echo "REDIS_HOST=redis" >> $GITHUB_ENV
+    #     echo "REDIS_PORT=6379" >> $GITHUB_ENV
 
     - name: Build and run tests with Docker Compose
       run: |
