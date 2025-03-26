@@ -2,6 +2,7 @@ import express from 'express';
 import { createRequire } from "module";
 import { fileURLToPath } from 'url';
 import path from 'path';
+import {Mutex} from 'async-mutex';
 
 const require = createRequire(import.meta.url);
 const app = express();
@@ -29,7 +30,10 @@ class Webstack {
 		this.initIO();
 
 		// set well_coincount
-		this.redisAtomicWrite("well_coincount", 100000);
+
+		this.writeMutex = new Mutex();
+		this.state = {};
+		this.state["well_coincount"] = 100000;
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
@@ -60,33 +64,6 @@ class Webstack {
 	getRedis() {
 		return redis;
 	}
-
-	async redisAtomicWrite(key, value) {
-		const script = `
-			redis.call('SET', KEYS[1], ARGV[1])
-			redis.call('SADD', 'theyr', KEYS[1])
-			return redis.call('GET', KEYS[1])
-		`;
-		return await redis.eval(script, 1, key, value);
-	}
-
-	async redisAtomicGetKeys() {
-		const script = `
-		return redis.call('SMEMBERS', 'theyr')
-		`
-		const keys = await redis.eval(script, 0);
-		return keys;
-	}
-
-	async redisGetState() {
-		let keys = await this.redisAtomicGetKeys();
-		const state = {};
-		for (let key of keys) {
-			state[key] = await redis.get(key);
-		}
-		console.log("State: ", state);
-		return state;		
-	}
 	
 	initIO() {
 		io.on("connect_error", (err) => {
@@ -107,20 +84,31 @@ class Webstack {
 			// When a client detects a variable being changed they send the difference signal which is
 			// caught here and sent to other clients
 			socket.on('newState', async (diff) => {
-				let keys = Object.keys(diff); // is always gonna be 1 key
-				let key = keys[0];
-				if (key !== "userId" && key !== "nick") {
-					let val = diff[key];
-					if (typeof val === 'object' && val !== null) {
-						val = JSON.stringify(val);
+				const release = await this.writeMutex.acquire();
+				try {
+					// console.log("Start exec");
+					let keys = Object.keys(diff); // is always gonna be 1 key
+					let key = keys[0];
+					if (key !== "userId" && key !== "nick") {
+						let val = diff[key];
+						if (typeof val === 'object' && val !== null) {
+							val = JSON.stringify(val);
+						}
+						let returnObj = {};
+						// let reutrnState = await this.redisAtomicWrite(`${key}`, val);
+						this.state[`${key}`] = val;
+						returnObj[key] = val;
+						// console.log("onj: ", returnObj);
+						socket.broadcast.emit('difference', returnObj);
+						// console.log("Emit");
+					} else if (key === "userId") {
+						this.socketClientMap[socket.id] = diff[key];
 					}
-					let returnObj = {};
-					let reutrnState = await this.redisAtomicWrite(`${key}`, val);
-					returnObj[key] = reutrnState;
-					// console.log("onj: ", returnObj);
-					socket.broadcast.emit('difference', returnObj);
-				} else if (key === "userId") {
-					this.socketClientMap[socket.id] = diff[key];
+				} catch (err) {
+					console.error("Error processing newState:", err);
+				} finally {
+					// console.log("Release");
+					release();
 				}
 			});
 

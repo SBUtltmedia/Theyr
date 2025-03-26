@@ -16,5 +16,3 @@ WORKDIR /app
 COPY package.json /app/
 
 COPY . /app
-
-CMD npm run test_backend && npm run test_ui

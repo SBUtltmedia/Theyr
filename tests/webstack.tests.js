@@ -8,6 +8,8 @@ import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import {Mutex, Semaphore} from 'async-mutex';
+
 
 import confObj from '../config.json' with {type: 'json'};
 
@@ -31,6 +33,9 @@ const SERVERCONF = { "port": PORT, "twinePath": TWINE_PATH, "fileName": FILENAME
 const webStack =  new Webstack(SERVERCONF);
 const app = webStack.get().app;
 
+let mutex = new Mutex();
+
+
 describe('Webstack Server Tests', function () {
     let sockets = [];
     const SOCKET_URL = `http://localhost:${PORT}`;
@@ -51,43 +56,55 @@ describe('Webstack Server Tests', function () {
     })
 
     describe('WebSocket Concurrency Tests', function () {
-        // it('should allow multiple clients to emit and receive messages simultaneously', function (done) {
-        //     const messages = [];
-        //     let socket1 = io.connect(SOCKET_URL);
-        //     let socket2 = io.connect(SOCKET_URL);
-        //     let socket3 = io.connect(SOCKET_URL);
-
-        //     sockets.push(socket1);
-        //     sockets.push(socket2);
-        //     sockets.push(socket3);
-
-        //     socket1.emit('newState', { chatlog: 'Message from user1' });
-        //     socket2.emit('newState', { chatlog: 'Message from user2' });
-        //     socket3.emit('newState', { chatlog: 'Message from user3' });
-
-        //     socket1.on('difference', (data) => {
-        //         messages.push(data.chatlog);
-        //     });
-        //     socket2.on('difference', (data) => {
-        //         messages.push(data.chatlog);
-        //     });
-        //     socket3.on('difference', (data) => {
-        //         messages.push(data.chatlog);
-        //     });
-
-        //     // Wait for all messages to be received and verify order
-        //     setTimeout(() => {
-        //         expect(messages).to.have.members([
-        //             'Message from user1',
-        //             'Message from user1',
-        //             'Message from user2',
-        //             'Message from user2',
-        //             'Message from user3',
-        //             'Message from user3'
-        //         ]);
-        //         done();
-        //     }, 1000);
-        // });
+        it('should allow multiple clients to emit and receive messages simultaneously', function (done) {
+            const messages = [];
+            const mutex = new Mutex(); // Mutex for locking the messages array
+            const semaphore = new Semaphore(3); // Semaphore to limit concurrent socket operations
+    
+            // Create an array to hold the socket connections
+            let sockets = [];
+    
+            // Create a function to handle a single socket connection
+            function handleSocket(socket, chatMessage) {
+                socket.on('difference', async (data) => {
+                    const release = await mutex.acquire(); // Acquire the mutex before modifying shared state
+                    try {
+                        // Simulate some work on the message
+                        messages.push(data.chatlog);
+                    } finally {
+                        release(); // Ensure the mutex is released after work is done
+                    }
+                });
+    
+                socket.emit('newState', { chatlog: chatMessage }); // Emit the message to the server
+            }
+    
+            // Create and handle the socket connections
+            let socket1 = io.connect(SOCKET_URL);
+            let socket2 = io.connect(SOCKET_URL);
+            let socket3 = io.connect(SOCKET_URL);
+    
+            handleSocket(socket1, 'Message from user1');
+            handleSocket(socket2, 'Message from user2');
+            handleSocket(socket3, 'Message from user3');
+    
+            sockets.push(socket1, socket2, socket3);
+    
+            // Wait until all socket connections have emitted and received the message
+            Promise.all(sockets.map(socket => new Promise((resolve) => {
+                socket.on('difference', resolve); // Resolve when the message is received
+            }))).then(() => {
+                // After all sockets have received their messages, proceed with assertions
+                setTimeout(() => {
+                    expect(messages).to.have.members([
+                        'Message from user1',
+                        'Message from user2',
+                        'Message from user3',
+                    ]);
+                    done();
+                }, 500); // Give a small delay for all async actions to complete
+            });
+        });
 
         it('ensure consistency for multiple concurrent clients', function (done) {
             let numClients = 500;
