@@ -20,7 +20,7 @@ describe('Web Server', function () {
         });
 
         page = await browser.newPage();
-        await page.goto("http://localhost:53134");
+        await page.goto("https://theyr-1.herokuapp.com");
     });
 
     this.afterAll(async () => {
