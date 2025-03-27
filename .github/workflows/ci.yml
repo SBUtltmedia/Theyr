@@ -26,13 +26,7 @@ jobs:
     # Install dependencies
     - name: Install dependencies
       run: |
-        npm install
-
-    - name: Install Redis
-      run: |
-        sudo apt-get update
-        sudo apt-get install redis-server -y
-        sudo systemctl start redis-server        
+        npm install    
 
     - name: Run server tests
       run: |
