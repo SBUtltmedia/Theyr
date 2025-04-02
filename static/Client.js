@@ -62,9 +62,14 @@ function createHandler(path = []) {
         set(target, key, value) {
             if (target[key] != value) {
                 // prevState = Object.assign({}, target);
-                console.log("set: ", key, value);
                 target[key] = value
                 path.shift();
+                console.log("set: ", path);
+                let k = path[0];
+                let v = path[1];
+                console.log(k, v);
+                let obj = {k: {v: target}};
+                console.log("Obj: ", obj);
                 emitNewVars(key, value);
             }
             return true
@@ -74,7 +79,7 @@ function createHandler(path = []) {
 
 function emitNewVars(key, value) {
     if (emitFlag && key !== "nick" && key !== "userId") {
-        console.log(key, value);
+        console.log("Emit: ", key, value);
         let newState = {};
         newState[key] = value;
         userData.gameState[key] = value;
@@ -85,9 +90,11 @@ function emitNewVars(key, value) {
 
 function initTheyr(lockInfo) {
     $(document).on(":storyready", function() {
-        console.log("SugarCube has fully initialized!");
+        console.log("SugarCube has fully initialized!", window.SugarCube.State.variables);
         updateSugarCubeState(userData.gameState);
         emitFlag = true;
+        console.log("User game data: ", userData.gameState);
+        emitNewVars("users", window.SugarCube.State.variables.users);
     });
     
     socket = io();

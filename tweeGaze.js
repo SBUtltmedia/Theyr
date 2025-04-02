@@ -3,7 +3,7 @@ import fs, { existsSync } from 'fs'
 import { exec, execFile } from 'child_process';
 import Extwee, { HTMLWriter, StoryFormat, StoryFormatParser, TweeWriter } from 'extwee'
 
-let tweegoBinaries = {"win32":"binaries/tweego-2.1.1-windows-x64", "linux":"binaries/tweego-2.1.1-macos-x64", "darwin":"binaries/tweego-2.1.1-macos-x64"};
+let tweegoBinaries = {"win32":"binaries/tweego-2.1.1-windows-x64", "linux":"binaries/tweego-2.1.1-linux-x64", "darwin":"binaries/tweego-2.1.1-macos-x64"};
 let tweeBinary = tweegoBinaries[process.platform] || tweegoBinaries["linux"];
 
 

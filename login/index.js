@@ -27,7 +27,7 @@ app.get('/', async ({ query }, response) => {
 
 	if (userData.nick) {
 		const gameState = webstackInstance.state;
-		console.log(gameState);
+		console.log("Init gs:", gameState);
 		for (let key of Object.keys(gameState)) {
             let val = gameState[key];
             let newVal;

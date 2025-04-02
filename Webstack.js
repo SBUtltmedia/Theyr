@@ -79,6 +79,7 @@ class Webstack {
 					// console.log("Start exec");
 					let keys = Object.keys(diff); // is always gonna be 1 key
 					let key = keys[0];
+					console.log(diff);
 					if (key !== "userId" && key !== "nick") {
 						let val = diff[key];
 						if (typeof val === 'object' && val !== null) {
@@ -86,6 +87,7 @@ class Webstack {
 						}
 						let returnObj = {};
 						this.state[`${key}`] = val;
+						console.log("State: ", this.state);
 						returnObj[key] = val;
 						// console.log("onj: ", returnObj);
 						socket.broadcast.emit('difference', returnObj);
