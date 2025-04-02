@@ -64,17 +64,34 @@ function createHandler(path = []) {
                 // prevState = Object.assign({}, target);
                 target[key] = value
                 path.shift();
-                console.log("set: ", path);
-                let k = path[0];
-                let v = path[1];
-                console.log(k, v);
-                let obj = {k: {v: target}};
-                console.log("Obj: ", obj);
-                emitNewVars(key, value);
+                // emitNewVars(key, value);
+                diffSet([...path,key], value)
             }
             return true
         }
     }
+}
+
+function diffSet(pathArr, value){
+    //find new value after setting is done
+    
+    //If an varible that has been labeled an exception is being set, stop
+    if (emitFlag) {
+        if(exceptions.includes(pathArr[0])){
+            return;
+        }
+        let currKey;
+        let prevKey = value
+        while(pathArr.length > 0){
+            currKey = {[pathArr.pop()]: prevKey};
+            prevKey = currKey;
+        }
+
+        console.log("diff:", currKey);
+        socket.emit('newState',  currKey)
+        $(document).trigger(":liveupdate");
+    }
+
 }
 
 function emitNewVars(key, value) {
@@ -94,7 +111,7 @@ function initTheyr(lockInfo) {
         updateSugarCubeState(userData.gameState);
         emitFlag = true;
         console.log("User game data: ", userData.gameState);
-        emitNewVars("users", window.SugarCube.State.variables.users);
+        // emitNewVars("users", window.SugarCube.State.variables.users);
     });
     
     socket = io();
