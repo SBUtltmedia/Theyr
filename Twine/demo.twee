@@ -120,7 +120,7 @@ Wallet: <<print $users[$userId]["wallet"]>> <br>
 
 <div id="take">
 <<button  "Take">>
-	/* <<set $well_coincount -= 1>> */
+	<<set $well_coincount -= 1>>
 	<<set $users[$userId]["wallet"] += 1>>
 <</button>>
 </div>

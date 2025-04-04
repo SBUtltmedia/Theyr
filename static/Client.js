@@ -9,22 +9,14 @@ var emitFlag = false;
 var prevState = [];
 
 function init() {
-    // $('#passages').html($('#passages').html().replace(/<br><br>/gm, ""));
-
-    // console.log(Window.SugarCubeState.passage);
-    // prevState = Object.assign({}, Window.SugarCubeState.variables);
-    // console.log(prevState);
     $("body").addClass("blur")
     $("body").one("click", () => {
         $("body").removeClass("blur")
     });
-    // setInterval(checkDif, 1000)
 }
-
 
 $(document).on(':passagestart', (ev) => {
     init()
-
 })
 
 function fullReset() {
@@ -37,14 +29,12 @@ function DOMTest() {
     return $("#passages").children()[0].innerHTML
 }
 
-
 // Returns the role of the current player
 function getUser() {
     let userId = Window.SugarCubeState.getVar("$role");
     let user = Window.SugarCubeState.getVar("$users")[userId];
     return user;
 }
-
 
 //Creates a handler for the state proxy, maintains entire path of var getting set for emitting to webstack
 function createHandler(path = []) {
@@ -86,8 +76,6 @@ function diffSet(pathArr, value){
             currKey = {[pathArr.pop()]: prevKey};
             prevKey = currKey;
         }
-
-        console.log("diff:", currKey);
         socket.emit('newState',  currKey)
         $(document).trigger(":liveupdate");
     }

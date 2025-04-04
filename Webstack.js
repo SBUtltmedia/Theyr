@@ -23,22 +23,12 @@ class Webstack {
 		this.socketClientMap = new Map();
 		this.initIO();
 
-		// set well_coincount
-
 		this.writeMutex = new Mutex();
 		this.state = {};
 		this.state["well_coincount"] = 100000;
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
-
-        // Serve static files from 'login/' directory
-        // app.use(express.static(path.join(__dirname, 'login')));
-
-        // // Default route to serve index.html if exists
-        // app.get('/', (req, res) => {
-        //     res.sendFile(path.join(__dirname, 'login', 'index.html'));
-        // });		
 
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`))
 		console.log("port exists")
@@ -53,6 +43,23 @@ class Webstack {
 
 	getHTTP() {
 		return http;
+	}
+
+	updateStateKeyVal(key, val) {
+		if (typeof val === 'object') {
+			let newK = Object.keys(val);
+			let newV = val[newK];
+
+			let data = this.state[key];
+
+			if (data !== null && data !== undefined && typeof data === 'object') {
+				this.state[key][newK] = newV;
+			} else {
+				this.state[key] = val;
+			}
+		} else {
+			this.state[key] = val;
+		}
 	}
 	
 	initIO() {
@@ -79,26 +86,19 @@ class Webstack {
 					// console.log("Start exec");
 					let keys = Object.keys(diff); // is always gonna be 1 key
 					let key = keys[0];
-					console.log(diff);
+					
 					if (key !== "userId" && key !== "nick") {
 						let val = diff[key];
-						if (typeof val === 'object' && val !== null) {
-							val = JSON.stringify(val);
-						}
 						let returnObj = {};
-						this.state[`${key}`] = val;
-						console.log("State: ", this.state);
-						returnObj[key] = val;
-						// console.log("onj: ", returnObj);
+						this.updateStateKeyVal(key, val);
+						returnObj[key] = val;;
 						socket.broadcast.emit('difference', returnObj);
-						// console.log("Emit");
 					} else if (key === "userId") {
 						this.socketClientMap[socket.id] = diff[key];
 					}
 				} catch (err) {
 					console.error("Error processing newState:", err);
 				} finally {
-					// console.log("Release");
 					release();
 				}
 			});
