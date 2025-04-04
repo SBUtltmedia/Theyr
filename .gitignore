@@ -4,3 +4,4 @@ node_modules
 tests.js
 jsonFS/data/**
 mapData.json
+server_state.json

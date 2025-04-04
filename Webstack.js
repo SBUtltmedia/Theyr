@@ -3,6 +3,7 @@ import { createRequire } from "module";
 import { fileURLToPath } from 'url';
 import path from 'path';
 import {Mutex} from 'async-mutex';
+import fs from 'fs';
 
 const require = createRequire(import.meta.url);
 const app = express();
@@ -24,19 +25,65 @@ class Webstack {
 		this.initIO();
 
 		this.writeMutex = new Mutex();
-		this.state = {};
-		this.state["well_coincount"] = 100000;
+
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
+		this.stateFilePath = path.join(__dirname, 'server_state.json')
+
+		this.state = this.loadState() || { well_coincount: 100000 };
+
+		this.shutdown = this.shutdown.bind(this);
+		process.on('SIGINT', this.shutdown);
+		process.on('SIGTERM', this.shutdown);
+
 
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`))
 		console.log("port exists")
 
 	}
 
+	loadState() {
+		try {
+			if (fs.existsSync(this.stateFilePath)) {
+				const data = fs.readFileSync(this.stateFilePath, 'utf-8');
+				console.log('State loaded from file.');
+				return JSON.parse(data);
+			}
+		} catch (err) {
+			console.error('Error reading state file:', err);
+		}
+		return null;
+	}
+
+	saveState() {
+		try {
+			fs.writeFileSync(this.stateFilePath, JSON.stringify(this.state, null, 2));
+			console.log('State saved to file.');
+		} catch (err) {
+			console.error('Error saving state:', err);
+		}
+	}
+
+	shutdown() {
+		console.log('\nGracefully shutting down...');
+
+		this.saveState();
+
+		http.close(() => {
+			console.log('Closed out remaining connections.');
+			process.exit(0);
+		});
+
+		setTimeout(() => {
+			console.error('Forcefully shutting down.');
+			process.exit(1);
+		}, 10000);
+	}
+
+
 	get() {
-		return {
+		return {	
 			app
 		}
 	}
@@ -86,7 +133,7 @@ class Webstack {
 					// console.log("Start exec");
 					let keys = Object.keys(diff); // is always gonna be 1 key
 					let key = keys[0];
-					
+
 					if (key !== "userId" && key !== "nick") {
 						let val = diff[key];
 						let returnObj = {};
@@ -119,9 +166,6 @@ class Webstack {
 		});
 	}
 }
-
-
-
 
 
 export default Webstack;
