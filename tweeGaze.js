@@ -3,8 +3,7 @@ import fs, { existsSync } from 'fs'
 import { exec, execFile } from 'child_process';
 import Extwee, { HTMLWriter, StoryFormat, StoryFormatParser, TweeWriter } from 'extwee'
 
-let tweegoBinaries = {"win32":"binaries/tweego-2.1.1-windows-x64", "linux":"binaries/tweego-2.1.1-linux-x64", "darwin":"binaries/tweego-2.1.1-macos-x64"};
-let tweeBinary = tweegoBinaries[process.platform] || tweegoBinaries["linux"];
+let tweeBinary = "tools/tweego";
 
 
 let coolDown = 0;
@@ -52,6 +51,8 @@ gaze('Twine/*.*', function (err, watcher) {
                     // `${modulePath}resize.js`,
                     // `${modulePath}picker.js`,
                 ]
+
+                console.log(command);
 
                 args = ["-f", "sugarcube-2", `${prefix}.${suffix}`, "-o", `${prefix}.html`];
                 // for (const module of modules) {
