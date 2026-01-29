@@ -1,0 +1,54 @@
+
+node_modules
+config.json
+/loginDiscord/testVars.json
+/loginDiscord/index.html
+
+# Unity - CRITICAL: Don't commit Library folder (auto-generated)
+Unity/[Ll]ibrary/
+Unity/[Tt]emp/
+Unity/[Oo]bj/
+Unity/[Bb]uild/
+Unity/[Bb]uilds/
+Unity/[Ll]ogs/
+Unity/[Uu]ser[Ss]ettings/
+
+# Unity auto-generated files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Unity crash logs
+sysinfo.txt
+crashlytics-build.properties
+
+# Unity memory captures (can be huge)
+*.memcapture
+*.psd.meta
+*.ai.meta
+
+# Visual Studio cache
+Unity/.vs/
+Unity/*.csproj
+Unity/*.unityproj
+Unity/*.sln
+Unity/*.suo
+Unity/*.tmp
+Unity/*.user
+Unity/*.userprefs
+Unity/*.pidb
+Unity/*.booproj
+Unity/*.svd
+Unity/*.pdb
+Unity/*.mdb
+Unity/*.opendb
+Unity/*.VC.db
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

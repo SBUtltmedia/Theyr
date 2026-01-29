@@ -1,0 +1,6 @@
+[SERVER] No persistent state found, using leanVars.json
+App listening at http://localhost:53134
+[AUTH] Mock login successful for: Alice (player)
+SERVER RECEIVES NEW USER: 1001
+[AUTH] Mock login successful for: Bob (player)
+SERVER RECEIVES NEW USER: 1002

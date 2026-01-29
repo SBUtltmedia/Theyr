@@ -1,0 +1,8 @@
+macros:
+  th-set:
+    name: th-set
+    description: "Server-authoritative state update macro."
+    parameters:
+      - name: expression
+        type: string
+        description: "The assignment expression (e.g. '$var = 5' or '$var += 1')."

@@ -1,0 +1,11 @@
+# Absolute must-haves for Unity
+Unity/Library/
+Unity/Temp/
+Unity/Obj/
+Unity/Logs/
+Unity/UserSettings/
+Unity/MemoryCaptures/
+
+# Binary & Metadata Bloat
+*.meta
+*.fbx

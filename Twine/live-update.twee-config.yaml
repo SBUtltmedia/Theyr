@@ -1,0 +1,18 @@
+macros:
+  live:
+    name: live
+    alias: [ l, lh ]
+    description: "Evaluates an expression and wraps the result in a live-updating <span>."
+    parameters:
+      - name: expression
+        type: string
+        description: "The expression to evaluate."
+  liveblock:
+    name: liveblock
+    alias: [ lb ]
+    container: true
+    description: "Wraps content in a live-updating <span>."
+  update:
+    name: update
+    alias: [ upd ]
+    description: "Triggers a live update for all elements with the .macro-live class."
