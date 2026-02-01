@@ -1,7 +1,15 @@
 import fs from 'fs'
 import path from 'path'
 import webstack from '../Webstack.js'
-import '../tweeGaze.js'
+
+// Only run the Twine file watcher in development
+if (process.env.NODE_ENV !== 'production') {
+    import('../tweeGaze.js').then(() => {
+        console.log("[DEV] Twine file watcher (Gaze) active.");
+    }).catch(err => {
+        console.error("[DEV] Failed to load Twine watcher:", err);
+    });
+}
 
 // Default configuration
 const defaults = {

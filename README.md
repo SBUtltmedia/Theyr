@@ -144,7 +144,22 @@ Yes. NodeJS runs the server, manages the "Source of Truth," and handles persiste
 ## 🚀 Deployment
 
 ### Recommended: Render.com
-1. Create a new **Web Service** on Render.
-2. Connect your GitHub repository.
-3. Set the **Start Command** to `npm run dev`.
-4. **Note on Persistence:** On Render's Free Tier, `gameState.json` is deleted daily. Upgrade to a paid plan and use a **"Persistent Disk"** for permanent storage.
+
+Theyr is pre-configured for easy deployment on **Render**.
+
+#### 1. Quick Deploy (Blueprint)
+Theyr includes a `render.yaml` file. You can create a **"Blueprint"** on Render, and it will automatically configure the build and start commands for you.
+
+*   **Build Command**: `npm install && npm run build`
+*   **Start Command**: `npm start`
+
+#### 2. Persistence (Game State)
+By default, Render's filesystem is ephemeral. To save your game state permanently across restarts:
+1.  Upgrade your service to a **paid plan** (e.g., Starter).
+2.  Add a **Persistent Disk** in the Render dashboard.
+3.  Mount the disk at `/opt/render/project/src/data`.
+4.  Set the environment variable `STATE_FILE_PATH` to `/opt/render/project/src/data/gameState.json`.
+
+*Note: On the free tier, the `gameState.json` will reset whenever the server goes to sleep or you redeploy.*
+
+---

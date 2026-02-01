@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: theyr-multiplayer
+    env: node
+    plan: free # Can be upgraded to starter if a persistent disk is needed
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: STATE_FILE_PATH
+        value: /opt/render/project/src/data/gameState.json
+    # Uncomment the following lines if using a paid plan with a persistent disk
+    # disk:
+    #   name: theyr-data
+    #   mountPath: /opt/render/project/src/data
+    #   sizeGB: 1

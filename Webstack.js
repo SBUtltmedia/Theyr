@@ -9,7 +9,8 @@ const io = require('socket.io')(http);
 const _ = require("lodash"); 
 const initVars = require("./leanVars.json");
 
-const STATE_FILE = './gameState.json';
+// Allow persistence path to be overridden by environment variable (e.g., for Render Disks)
+const STATE_FILE = process.env.STATE_FILE_PATH || './gameState.json';
 
 class Webstack {
 	constructor(serverConf) {
