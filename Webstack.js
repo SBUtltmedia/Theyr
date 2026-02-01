@@ -122,6 +122,7 @@ class Webstack {
 					payload: diff
 				})
 
+				socket.emit('difference', diff);
 				socket.broadcast.emit('difference', diff);
 			})
 

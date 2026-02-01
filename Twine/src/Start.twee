@@ -1,0 +1,37 @@
+:: Start {"position":"100,100","size":"100,100"}
+<<run
+    // Identify the user (Private exception variable)
+    if (window.userData && window.userData.authData) {
+        State.variables.userId = window.userData.authData.username;
+    } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        State.variables.userId = urlParams.get('nick') || "User_" + Math.floor(Math.random() * 1000);
+    }
+>>
+
+<<liveblock>>
+    /* Server state will overwrite these if they exist on server */
+    <h1>🚀 Theyr Modular Demo</h1>
+
+    Welcome, **<<print $users[$userId]?.name || $userId>>**! (ID: $userId)
+
+    <div style="background: #333; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <h3>Set Your Public Name:</h3>
+        <<textbox "_draftName" ($users[$userId]?.name || $userId)>> 
+        <<button "Confirm Name">>
+            <<th-set $users[$userId].name to _draftName>>
+        <</button>>
+    </div>
+
+    [[Enter the Chat Room|ChatRoom]]
+
+    /* Debug/Testing tools for Authors */
+    <<if window.userData && window.userData.authData && window.userData.authData.roles.includes('admin')>>
+        <div style="margin-top: 50px; border-top: 1px dashed #666; padding-top: 10px; font-size: 0.8em; opacity: 0.7;">
+            <b>Author Tools:</b> 
+            <<button "Reset Shared Server State">>
+                <<run window.socket.emit('fullReset')>>
+            <</button>>
+        </div>
+    <</if>>
+<</liveblock>>

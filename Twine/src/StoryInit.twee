@@ -1,0 +1,16 @@
+:: StoryInit
+/* 
+ * SugarCube Standard: Initialize variables here.
+ * For server-authoritative variables, we define them here, 
+ * but they will be overwritten by the server's state upon connection.
+ */
+
+<<set $users to {}>>
+<<set $chatMessages to []>>
+<<set $globalCounter to 0>>
+
+<<run
+    if (window.userData && window.userData.authData) {
+        State.variables.userId = window.userData.authData.username;
+    }
+>>

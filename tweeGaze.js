@@ -1,5 +1,6 @@
 import gaze from 'gaze'
 import fs, { existsSync } from 'fs'
+import path from 'path'
 import { exec } from 'child_process';
 import Extwee, { HTMLWriter, StoryFormat, StoryFormatParser, TweeWriter } from 'extwee'
 
@@ -12,50 +13,32 @@ gaze('Twine/**/*.*', function (err, watcher) {
     var watched = this.watched();
     // console.log(watched)
     
-    // On file changed 
+// On file changed 
     this.on('changed', function (filepath) {
-        // Execute command
-        const mtime = fs.statSync(filepath).mtime;
+        compile(filepath);
+    });
+
+    // Initial Build
+    console.log("[GAZE] Performing initial build...");
+    compile('Twine/src/placeholder.twee'); // Trigger build for the modular source
+
+    function compile(filepath) {
+        const mtime = fs.existsSync(filepath) ? fs.statSync(filepath).mtime : Date.now();
         if (mtime - coolDown > 1000) {
             coolDown = mtime
 
-            let [suffix, ...prefix] = filepath.split(".").reverse();
-            prefix = prefix.reverse().join(".");
-            let command, args;
-            if (suffix == "html") {
-                let outFile = `${prefix}.tw`
-                fs.truncate(outFile, 0, ((err) => {}))
+            // We now use the npm script for a cross-platform build
+            const command = `npm run build`;
 
-                command = `npx tweego -f sugarcube-2 -d -o "${prefix}.twee" "${prefix}.html"`;
-            } 
-            else if (suffix == "twee" || suffix == "tw" || suffix == "js" || suffix == "css") {
-                let targetTwee = `${prefix}.${suffix}`;
-                let outputHtml = `${prefix}.html`;
-
-                if (suffix === 'js' || suffix === 'css') {
-                    targetTwee = 'Twine/LeanDemo.twee';
-                    outputHtml = 'Twine/LeanDemo.html';
-                }
-
-                command = `npx tweego -f sugarcube-2 "${targetTwee}" Twine/modules/ Twine/demo_style.css -o "${outputHtml}"`;
-            } 
-            else {
-                console.log(prefix, suffix)
-                return
-            }
-
-            // Executes shell command 
             exec(command, (err, stdout, stderr) => { 
                 if (err) {
-                    console.error(err)
+                    console.error("[GAZE] Build Error:", err)
+                } else {
+                    console.log(`[GAZE] Built: Twine/index.html`);
                 }
             });
-
-            // console.log(existsSync());
-            // console.log(existsSync(`${prefix}.${suffix}`))
-            console.log(filepath + ' was changed');
         }
-    });
+    }
 
     // Get watched files with relative paths 
     var files = this.relative();

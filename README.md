@@ -85,25 +85,33 @@ If you are writing custom JavaScript, you can trigger syncs directly:
 
 ### Quick Start
 1.  **Install Dependencies:** `npm install`
-2.  **Start the Server:** `npm run dev`
-3.  **Build the Story:** `npx tweego -f sugarcube-2 Twine/LeanDemo.twee Twine/modules/ Twine/demo_style.css -o Twine/LeanDemo.html`
+2.  **Start the Server:** `npm start` (Starts the server and automatically watches/builds Twine files on save)
+3.  **Manual Build:** `npm run build` (If you just want to compile without starting the server)
+
+### 🧪 Testing Suite
+Theyr now includes a comprehensive testing suite powered by **Playwright** to ensure multiplayer synchronization and UI reactivity stay rock-solid.
+
+*   **Run All Tests:** `npm test`
+*   **Interactive UI Mode:** `npm run test:ui` (Visual debugging)
+*   **Debug Mode:** `npm run test:debug`
+*   **View Report:** `npm run report`
+
+The tests simulate multiple concurrent users to verify real-time state broadcasting and the custom macro logic.
 
 ### 🗝️ Mock Login System
-Theyr includes a built-in mock login screen that mimics a real OAuth flow (like Discord). This allows you to:
-*   **Start Instantly:** No setup required for development.
-*   **Multiplayer Testing:** Open the game in two browser tabs to test distinct players.
-*   **Role Testing:** Test role-based logic by selecting roles on the login screen.
+Theyr includes a built-in mock login screen at `/` that mimics a real OAuth flow.
+*   **Auto-Redirect:** If you aren't "logged in," the server serves the entry portal.
+*   **Data Injection:** Once you enter a name, the server injects your data into the `<head>` of the Twine story, making it available as `window.userData`.
 
-### 💾 State Persistence
-Automatically persists your game state to `gameState.json`. 
-*   **Auto-Save:** Saves entire state on shutdown (e.g. `Ctrl+C`).
-*   **Auto-Load:** Resumes exactly where it left off on startup.
-*   **Reset:** Delete `gameState.json` and restart the server to reset.
-
-### 🏗️ Architecture
-*   **`Twine/LeanDemo.twee`**: Main story content.
-*   **`Twine/modules/`**: Engine logic (`th-set.js`, `ClientDemo.js`, `live-update.js`).
-*   **`leanVars.json`**: Initial server-side state.
+### 🏗️ Architecture & File Structure
+*   **`Twine/src/`**: Modular Twee source files (`StoryInit`, `Start`, `ChatRoom`).
+*   **`Twine/modules/`**: Engine logic and custom macros.
+*   **`login/`**: The mock authentication portal.
+*   **`tests/`**: Playwright end-to-end tests.
+*   **`build-twine.js`**: Cross-platform build script using `tweego-bin`.
+*   **`tweeGaze.js`**: File watcher that triggers builds automatically during development.
+*   **`gameState.json`**: Persistent server-side state.
+*   **`leanVars.json`**: Initial "clean" state used for resets.
 
 ---
 

@@ -27,14 +27,34 @@
                 return this.error(`bad evaluation: ${typeof e === 'object' ? e.message : e}`);
             }
 
+            // Resolve bracketed variables in the path (e.g., $users[$userId] -> $users["TestPlayer"])
+            // This ensures the server (which doesn't know SugarCube variables) gets a clean path.
+            let resolvedVarPath = varPath.replace(/\[\s*(\$[a-zA-Z_]\w*)\s*\]/g, (match, v) => {
+                try {
+                    const val = State.getVar(v);
+                    return "[" + JSON.stringify(val) + "]";
+                } catch (e) {
+                    return match;
+                }
+            });
+
             const isException = window.exceptions && window.exceptions.some(ex =>
                 varPath === ex || varPath.startsWith(ex.replace('$', '') + '.')
             );
 
             if (operator === '=') {
-                State.setVar(varPath, rightValue);
+                // Optimistic local update using SugarCube's built-in logic
+                try {
+                    State.temporary._th_temp_val = rightValue;
+                    // Note: resolvedVarPath contains evaluated brackets, making it safer for evalTwineScript
+                    Scripting.evalTwineScript(`${resolvedVarPath} = _th_temp_val`);
+                } catch (err) {
+                    // Fallback to simpler method if eval fails
+                    State.setVar(varPath, rightValue);
+                }
+
                 if (!isException && window.socket && window.socket.connected) {
-                    window.sendStateUpdate(varPath, rightValue);
+                    window.sendStateUpdate(resolvedVarPath, rightValue);
                 }
             } 
             else {
@@ -49,7 +69,10 @@
                         case '/=': optimisticValue /= rightValue; break;
                         case '%=': optimisticValue %= rightValue; break;
                     }
-                    State.setVar(varPath, optimisticValue);
+
+                    // Optimistic local update
+                    State.temporary._th_temp_val = optimisticValue;
+                    Scripting.evalTwineScript(`${resolvedVarPath} = _th_temp_val`);
                 } catch (err) {
                     console.warn("[th-set] Optimistic update failed", err);
                 }
@@ -61,7 +84,7 @@
                     if (operator === '/=') operationName = 'divide';
                     if (operator === '%=') operationName = 'modulus';
 
-                    window.sendAtomicUpdate(varPath, operationName, rightValue);
+                    window.sendAtomicUpdate(resolvedVarPath, operationName, rightValue);
                 }
             }
             $(document).trigger(':liveupdateinternal');

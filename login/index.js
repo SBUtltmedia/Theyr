@@ -1,19 +1,34 @@
 import fs from 'fs'
+import path from 'path'
 import webstack from '../Webstack.js'
 import '../tweeGaze.js'
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const configObj = require('../config.json');
 
-const { port, twinePath } = configObj.serverconf;
+// Default configuration
+const defaults = {
+    port: 3000,
+    twinePath: 'Twine/index.html',
+    appID: 1
+};
 
-const PORT = process.env.PORT || port
-const TWINE_PATH = process.env.twinePath || twinePath;
-const appID = process.env.appID || 1
+// Try to load config.json if it exists, but don't fail if it's missing
+let configObj = { serverconf: {} };
+try {
+    const configPath = path.resolve(process.cwd(), 'config.json');
+    if (fs.existsSync(configPath)) {
+        configObj = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    }
+} catch (err) {
+    console.warn("[CONFIG] Could not read config.json, using defaults.");
+}
+
+const PORT = process.env.PORT || configObj.serverconf?.port || defaults.port;
+const TWINE_PATH = process.env.TWINE_PATH || configObj.serverconf?.twinePath || defaults.twinePath;
+const appID = process.env.appID || configObj.serverconf?.appID || defaults.appID;
 
 const serverConf = {
 	port: PORT,
 	appIndex: appID,
+	twinePath: TWINE_PATH,
 	...configObj.serverconf
 };
 
@@ -26,21 +41,14 @@ app.get('/', async ({ query }, response) => {
 	const userData = query;
 
 	if (userData.nick) {
-		// Mimic a full Discord OAuth data structure
+		// Mimic a full Discord OAuth data structure for easy transition later
 		const authData = {
 			id: userData.id || Date.now().toString(),
 			username: userData.nick,
-			discriminator: (Math.floor(Math.random() * 9000) + 1000).toString(),
-			avatar: null, // No avatar in mock
+			roles: userData.role ? [userData.role] : ['player'],
+			avatar: null,
 			verified: true,
 			email: `${userData.nick.toLowerCase()}@mock.theyr`,
-			flags: 0,
-			banner: null,
-			accent_color: null,
-			premium_type: 0,
-			public_flags: 0,
-			roles: userData.mock_role ? [userData.mock_role] : ['player'],
-			nick: userData.nick // Guild-specific nickname
 		};
 		
 		const gameState = webstackInstance.serverStore.getState();
@@ -59,19 +67,6 @@ app.get('/', async ({ query }, response) => {
  * Embeds user data and game state into the Twine story and serves it.
  */
 function returnTwine(userData, response) {
-	// Handle private variables (visible only to the owner)
-	if(userData.gameState && userData.gameState.theyrPrivateVars){
-		Object.keys(userData.gameState.theyrPrivateVars).forEach((id)=>{
-			if(userData.authData && id != userData.authData.id){
-				delete userData.gameState.theyrPrivateVars[id];
-			}
-		})
-	}
-
-	if(userData.gameState && !userData.gameState.theyrPrivateVars){
-		userData.gameState.theyrPrivateVars = {};
-	}
-
 	// Inject the userData into the global window scope for the Twine client to read
 	let userDataScript=`
 		<script>
@@ -79,12 +74,13 @@ function returnTwine(userData, response) {
 		window.userData = ${JSON.stringify(userData)};
 		console.log("[THEYR] User Data Loaded:", window.userData.authData.username);
 		</script>
-	`
+	</head>`;
 	
 	try {
 		let fileContents = fs.readFileSync(TWINE_PATH, 'utf8');
-		// Append the script before the closing body tag or at the end
-		return response.send(`${fileContents} ${userDataScript}`);
+		// Inject into the <head> instead of just appending to the end of the file
+		let modifiedHtml = fileContents.replace('</head>', userDataScript);
+		return response.send(modifiedHtml);
 	} catch (err) {
 		console.error("[ERROR] Failed to read Twine file:", TWINE_PATH);
 		return response.status(500).send(`Failed to load story: ${TWINE_PATH}. Make sure you have compiled your Twee files.`);

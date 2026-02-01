@@ -25,9 +25,20 @@ window.initMultiplayerClient = function() {
 
 
 /**
- * Initialize user from URL parameters
+ * Initialize user from URL parameters or injected data
  */
 function initFromURL() {
+    // 1. Try injected window.userData first (from login/index.js)
+    if (window.userData && window.userData.authData) {
+        const userId = window.userData.authData.username;
+        console.log(`Initializing user from window.userData: ${userId}`);
+        if (window.SugarCube && window.SugarCube.State) {
+            window.SugarCube.State.variables.userId = userId;
+        }
+        return;
+    }
+
+    // 2. Fallback to URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
 
@@ -71,6 +82,11 @@ function initSocket() {
         console.log('Received initial state from server (new connection)');
         updateSugarCubeState(state);
         stateReceived = true;
+    });
+
+    socket.on('reset', () => {
+        console.log('Server state reset. Reloading...');
+        window.location.reload();
     });
 
     socket.on('error', (error) => {
