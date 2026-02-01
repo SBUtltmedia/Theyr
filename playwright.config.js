@@ -25,5 +25,15 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'demo',
+      use: { 
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          slowMo: 1000, // 1 second between actions
+        }
+      },
+      timeout: 60 * 1000,
+    },
   ],
 });

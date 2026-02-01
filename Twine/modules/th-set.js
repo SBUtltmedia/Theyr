@@ -43,13 +43,24 @@
             );
 
             if (operator === '=') {
-                // Optimistic local update using SugarCube's built-in logic
+                // Optimistic local update
                 try {
                     State.temporary._th_temp_val = rightValue;
-                    // Note: resolvedVarPath contains evaluated brackets, making it safer for evalTwineScript
+                    
+                    // Robust assignment: Ensure parent objects exist (e.g., $users["ID"])
+                    // This prevents "Cannot set properties of undefined" errors.
+                    const parts = resolvedVarPath.split('.');
+                    if (parts.length > 1) {
+                        const parentPath = parts.slice(0, -1).join('.');
+                        if (!State.getVar(parentPath)) {
+                            // If parent doesn't exist, try to initialize it as an object
+                            State.setVar(parentPath, {});
+                        }
+                    }
+
                     Scripting.evalTwineScript(`${resolvedVarPath} = _th_temp_val`);
                 } catch (err) {
-                    // Fallback to simpler method if eval fails
+                    // Fallback to simpler method
                     State.setVar(varPath, rightValue);
                 }
 

@@ -1,26 +1,49 @@
 :: Start {"position":"100,100","size":"100,100"}
-<<run
-    // Identify the user (Private exception variable)
+<<script>>
+    // Identify the user
     if (window.userData && window.userData.authData) {
         State.variables.userId = window.userData.authData.username;
     } else {
         const urlParams = new URLSearchParams(window.location.search);
         State.variables.userId = urlParams.get('nick') || "User_" + Math.floor(Math.random() * 1000);
     }
->>
+    
+    // Ensure the user's object exists
+    if (!State.variables.users) {
+        State.variables.users = {};
+    }
+    if (!State.variables.users[State.variables.userId]) {
+        State.variables.users[State.variables.userId] = { 
+            name: State.variables.userId
+        };
+    }
+<</script>>
 
 <<liveblock>>
-    /* Server state will overwrite these if they exist on server */
     <h1>🚀 Theyr Modular Demo</h1>
 
-    Welcome, **<<print $users[$userId]?.name || $userId>>**! (ID: $userId)
+    <<set _currentName to ($users && $users[$userId] ? $users[$userId].name : $userId)>>
+    Welcome, **_currentName**! (ID: $userId)
 
     <div style="background: #333; padding: 15px; border-radius: 5px; margin: 15px 0;">
         <h3>Set Your Public Name:</h3>
-        <<textbox "_draftName" ($users[$userId]?.name || $userId)>> 
+        <<set _draftName to _currentName>>
+        <<textbox "_draftName" _draftName>> 
         <<button "Confirm Name">>
             <<th-set $users[$userId].name to _draftName>>
         <</button>>
+    </div>
+
+    <div style="margin: 20px 0; border: 1px solid #444; padding: 10px;">
+        <h3>Who else is here?</h3>
+        <ul>
+        <<for _id, _data range $users>>
+            <li>
+                <strong><<print _data.name || _id>></strong> 
+                <<if _id === $userId>> (You) <</if>>
+            </li>
+        <</for>>
+        </ul>
     </div>
 
     [[Enter the Chat Room|ChatRoom]]
