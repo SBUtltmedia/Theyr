@@ -147,13 +147,16 @@ Yes. NodeJS runs the server, manages the "Source of Truth," and handles persiste
 
 Theyr is pre-configured for easy deployment on **Render**.
 
-#### 1. Glitch (Absolute Free / No CC)
-[Glitch.com](https://glitch.com/) is the easiest way to host and share **Theyr**.
-1. Sign up for a free account (No Credit Card required).
-2. Click **"New Project"** -> **"Import from GitHub"**.
-3. Paste your repository URL.
-4. Glitch will automatically install dependencies, build the Twine story, and start the server.
-5. **Pro-tip**: Others can "Remix" your project to instantly start their own multiplayer world.
+#### 1. Hugging Face Spaces (Absolute Free / No CC)
+[Hugging Face Spaces](https://huggingface.co/spaces) is currently the most stable way to host **Theyr** for free without a credit card.
+
+1. Sign up for a free account at [HuggingFace.co](https://huggingface.co/).
+2. Click **"New Space"**.
+3. Give it a name and select **"Docker"** as the SDK.
+4. Select the **"Blank"** template.
+5. Once the space is created, go to the **"Settings"** tab and connect your GitHub repository.
+6. Hugging Face will automatically build your Docker container and start the server.
+7. **Pro-tip**: The app will be accessible at `https://huggingface.co/spaces/YOUR_USER/YOUR_SPACE_NAME`.
 
 #### 2. Koyeb (Free Tier)
 #### 3. Render (Blueprint)

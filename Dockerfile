@@ -14,8 +14,9 @@ COPY . .
 # 5. Build the Twine story
 RUN npm run build
 
-# 6. Expose the port (default for Theyr is 3000)
-EXPOSE 3000
+# 6. Expose the port (Hugging Face Spaces defaults to 7860)
+EXPOSE 7860
+ENV PORT=7860
 
 # 7. Start the server
 # Set NODE_ENV to production to disable the file watcher
