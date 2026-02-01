@@ -153,7 +153,13 @@ Theyr includes a `render.yaml` file. You can create a **"Blueprint"** on Render,
 *   **Build Command**: `npm install && npm run build`
 *   **Start Command**: `npm start`
 
-#### 2. Persistence (Game State)
+#### 2. Koyeb (Free Tier / No CC often possible)
+1. Sign up at [Koyeb.com](https://www.koyeb.com/).
+2. Create a new **App** and connect your GitHub repository.
+3. Koyeb will detect the `Dockerfile` and handle the build and deployment automatically.
+4. **Important**: Set the environment variable `PORT` to `3000` if Koyeb doesn't detect it automatically.
+
+#### 3. Persistence (Game State)
 By default, Render's filesystem is ephemeral. To save your game state permanently across restarts:
 1.  Upgrade your service to a **paid plan** (e.g., Starter).
 2.  Add a **Persistent Disk** in the Render dashboard.
