@@ -160,10 +160,14 @@ Theyr is pre-configured for easy deployment on **Render**.
 
 #### 2. Koyeb (Free Tier)
 #### 3. Render (Blueprint)
-1. Sign up at [Koyeb.com](https://www.koyeb.com/).
-2. Create a new **App** and connect your GitHub repository.
-3. Koyeb will detect the `Dockerfile` and handle the build and deployment automatically.
-4. **Important**: Set the environment variable `PORT` to `3000` if Koyeb doesn't detect it automatically.
+Theyr includes a `render.yaml` file. Create a **"Blueprint"** on Render to automatically configure build/start commands.
+
+### 🏠 Local Multiplayer Testing (ngrok)
+If you want to test with friends while running the server on your own computer:
+1. Start your server: `npm run dev` (usually on port 3000).
+2. Install [ngrok](https://ngrok.com/).
+3. Run: `ngrok http 3000`.
+4. Share the provided `.ngrok-free.app` URL with your testers.
 
 #### 3. Persistence (Game State)
 By default, Render's filesystem is ephemeral. To save your game state permanently across restarts:
