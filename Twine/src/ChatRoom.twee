@@ -23,22 +23,25 @@
 </div>
 
 <div style="margin-top: 10px;">
+    <<set _chatInput to "">>
     <<textbox "_chatInput" "">> 
     <<button "Send">>
         <<if _chatInput.trim() !== "">>
             <<run 
-                State.variables.chatMessages.push({
-                    user: $userId,
-                    text: _chatInput.trim(),
+                const msg = {
+                    user: State.variables.userId,
+                    text: State.variables._chatInput.trim(),
                     time: Date.now()
-                });
+                };
+                State.variables.chatMessages.push(msg);
                 // Keep only last 20 messages
                 if (State.variables.chatMessages.length > 20) {
                     State.variables.chatMessages.shift();
                 }
             >>
-            <<th-set '$chatMessages' to $chatMessages>>
+            <<th-set $chatMessages to $chatMessages>>
             <<set _chatInput to "">>
+            <<update>>
         <</if>>
     <</button>>
 </div>

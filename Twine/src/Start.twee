@@ -1,21 +1,28 @@
 :: Start {"position":"100,100","size":"100,100"}
 <<script>>
-    // Identify the user
+    // 1. Identify the user (Private/Local only)
     if (window.userData && window.userData.authData) {
         State.variables.userId = window.userData.authData.username;
     } else {
         const urlParams = new URLSearchParams(window.location.search);
         State.variables.userId = urlParams.get('nick') || "User_" + Math.floor(Math.random() * 1000);
     }
-    
-    // Ensure the user's object exists
-    if (!State.variables.users) {
-        State.variables.users = {};
-    }
-    if (!State.variables.users[State.variables.userId]) {
-        State.variables.users[State.variables.userId] = { 
-            name: State.variables.userId
-        };
+
+    // 2. Shared Registration: Only run this ONCE when entering the passage
+    // We check if the user is already in the list to avoid redundant updates
+    if (!State.variables.users || !State.variables.users[State.variables.userId]) {
+        console.log("[THEYR] Registering user in shared state...");
+        // Use the JS API directly to avoid macro re-render loops
+        const userEntry = { name: State.variables.userId };
+        
+        // Update locally
+        if (!State.variables.users) State.variables.users = {};
+        State.variables.users[State.variables.userId] = userEntry;
+        
+        // Update server
+        if (window.sendStateUpdate) {
+            window.sendStateUpdate(`$users["${State.variables.userId}"]`, userEntry);
+        }
     }
 <</script>>
 

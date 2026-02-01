@@ -14,13 +14,19 @@ Lean Multiplayer Demo
 
 :: Story JavaScript [script]
 /*
- * th-set: Server-Authoritative Variable Setting Macro (Lean Version)
+ * Theyr Multiplayer Configuration
  */
 
+// 1. Disable features that break multiplayer sync
+Config.saves.isAllowed = false;    // No local saves (state is server-side)
+Config.history.controls = false;   // No Back/Forward (actions are permanent)
+Config.history.maxStates = 1;      // Keep memory light
+
+// 2. Exception variables (Local only, never synced)
 window.exceptions = ['$userId', '$passageHistory'];
 setup.exceptions = window.exceptions;
 
-// Load Socket.IO and Initialize Client
+// 3. Load Socket.IO and Initialize Client
 (function() {
     const socketScript = document.createElement('script');
     socketScript.src = '/socket.io/socket.io.js';

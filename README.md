@@ -113,6 +113,13 @@ Theyr includes a built-in mock login screen at `/` that mimics a real OAuth flow
 *   **`gameState.json`**: Persistent server-side state.
 *   **`leanVars.json`**: Initial "clean" state used for resets.
 
+### 🛠️ Multiplayer UI Configuration
+Theyr explicitly disables several default SugarCube features to maintain synchronization between players:
+
+*   **Saves are Disabled**: Default local saves snapshot `$variables` to the browser. Loading an old save would attempt to overwrite the current live server state with stale data, causing massive de-syncs.
+*   **History Controls are Disabled**: The "Back" and "Forward" buttons rewind local state. In a multiplayer world, global actions (like incrementing a counter) are permanent and cannot be "undone" by a single player without affecting everyone else.
+*   **Single-State History**: Local history is limited to 1 state to keep the client memory-efficient and prevent "time-traveling" bugs.
+
 ---
 
 ## ❓ Frequently Asked Questions
