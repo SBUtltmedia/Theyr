@@ -147,13 +147,16 @@ Yes. NodeJS runs the server, manages the "Source of Truth," and handles persiste
 
 Theyr is pre-configured for easy deployment on **Render**.
 
-#### 1. Quick Deploy (Blueprint)
-Theyr includes a `render.yaml` file. You can create a **"Blueprint"** on Render, and it will automatically configure the build and start commands for you.
+#### 1. Glitch (Absolute Free / No CC)
+[Glitch.com](https://glitch.com/) is the easiest way to host and share **Theyr**.
+1. Sign up for a free account (No Credit Card required).
+2. Click **"New Project"** -> **"Import from GitHub"**.
+3. Paste your repository URL.
+4. Glitch will automatically install dependencies, build the Twine story, and start the server.
+5. **Pro-tip**: Others can "Remix" your project to instantly start their own multiplayer world.
 
-*   **Build Command**: `npm install && npm run build`
-*   **Start Command**: `npm start`
-
-#### 2. Koyeb (Free Tier / No CC often possible)
+#### 2. Koyeb (Free Tier)
+#### 3. Render (Blueprint)
 1. Sign up at [Koyeb.com](https://www.koyeb.com/).
 2. Create a new **App** and connect your GitHub repository.
 3. Koyeb will detect the `Dockerfile` and handle the build and deployment automatically.

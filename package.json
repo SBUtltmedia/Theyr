@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "node build-twine.js",
     "start": "node login/index.js",
     "dev": "nodemon login/index.js",
     "build": "node build-twine.js",
