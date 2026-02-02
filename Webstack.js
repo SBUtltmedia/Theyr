@@ -29,6 +29,9 @@ class Webstack {
 		// Load initial state from local file or fallback to leanVars
 		this.loadState();
 
+		// DM Mode: Watch for manual edits to the state file
+		this.watchStateFile();
+
 		http.listen(this.port, () => console.log(`App listening at http://localhost:${this.port}`));
 
 		process
@@ -64,11 +67,33 @@ class Webstack {
 		try {
 			const state = this.serverStore.getState();
 			console.log(`[SERVER] Saving state to ${STATE_FILE}...`);
+			// Temporarily ignore the watcher to avoid an infinite loop
+			this.isSaving = true;
 			fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 4));
 			console.log("[SERVER] State saved successfully.");
+			setTimeout(() => { this.isSaving = false; }, 100);
 		} catch (err) {
 			console.error("[SERVER] Error saving state:", err.message);
+			this.isSaving = false;
 		}
+	}
+
+	watchStateFile() {
+		if (!fs.existsSync(STATE_FILE)) return;
+		
+		console.log(`[DM-MODE] Watching ${STATE_FILE} for live edits...`);
+		fs.watch(STATE_FILE, (eventType) => {
+			if (eventType === 'change' && !this.isSaving) {
+				// Use a small debounce to allow the file write to finish
+				if (this.watchTimeout) clearTimeout(this.watchTimeout);
+				this.watchTimeout = setTimeout(() => {
+					console.log(`[DM-MODE] Manual edit detected in ${STATE_FILE}. Syncing with players...`);
+					this.loadState();
+					// Broadcast the fresh state to everyone
+					io.emit('new connection', this.serverStore.getState());
+				}, 100);
+			}
+		});
 	}
 
 	get() {
