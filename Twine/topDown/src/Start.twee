@@ -1,0 +1,54 @@
+:: Start {"position":"100,100","size":"100,100"}
+<<script>>
+    if (window.userData && window.userData.authData) {
+        State.variables.userId = window.userData.authData.username;
+    } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        State.variables.userId = urlParams.get('nick') || "User_" + Math.floor(Math.random() * 1000);
+    }
+
+    if (!State.variables.users || !State.variables.users[State.variables.userId]) {
+        const userEntry = {
+            name: State.variables.userId,
+            x: 400,
+            y: 300,
+            room: 'Start',
+            lastSeen: Date.now()
+        };
+        if (!State.variables.users) State.variables.users = {};
+        State.variables.users[State.variables.userId] = userEntry;
+        if (window.sendStateUpdate) {
+            window.sendStateUpdate(`$users["${State.variables.userId}"]`, userEntry);
+        }
+    }
+<</script>>
+
+<div id="game-stage">
+    <div id="walkway"></div>
+    <div id="other-players"></div>
+    <div id="player" class="sprite"></div>
+</div>
+
+<div id="chat-box"></div>
+
+<div id="ui-overlay">
+    <<liveblock>>
+    <div class="room-info">
+        <strong>Room:</strong> Start
+    </div>
+    <div class="player-list">
+        <strong>Players here:</strong>
+        <<for _id, _data range $users>>
+            <<if _data.room === "Start">>
+                <span class="player-tag <<if _id === $userId>>you<</if>>">
+                    <<print _data.name || _id>>
+                    <<if _id === $userId>> (you)<</if>>
+                </span>
+            <</if>>
+        <</for>>
+    </div>
+    <div class="controls-hint">
+        WASD to move | Walk into players to chat
+    </div>
+    <</liveblock>>
+</div>

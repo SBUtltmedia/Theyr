@@ -1,0 +1,8 @@
+:: StoryInit
+<<set $users to {}>>
+<<set $currentRoom to "0_0">>
+<<set $rooms to {}>>
+
+<<if window.userData && window.userData.authData>>
+    <<set $userId to window.userData.authData.username>>
+<</if>>

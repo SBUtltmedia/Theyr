@@ -7,6 +7,12 @@
     "start": "node login/index.js",
     "dev": "nodemon login/index.js",
     "build": "node build-twine.js",
+    "start:default": "cross-env STORY=default node login/index.js",
+    "start:topDown": "cross-env STORY=topDown node login/index.js",
+    "dev:default": "cross-env STORY=default nodemon login/index.js",
+    "dev:topDown": "cross-env STORY=topDown nodemon login/index.js",
+    "build:default": "node build-twine.js default",
+    "build:topDown": "node build-twine.js topDown",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
@@ -43,6 +49,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "nodemon": "^2.0.15",
     "tweego-bin": "^0.4.0"

@@ -1,0 +1,246 @@
+/* Top-Down Explorer Styles */
+
+#game-stage {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    margin: 20px auto;
+    background: #1a1a2e;
+    border: 2px solid #444;
+    overflow: hidden;
+}
+
+#walkway {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #16213e 25%, transparent 25%),
+                linear-gradient(-45deg, #16213e 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #16213e 75%),
+                linear-gradient(-45deg, transparent 75%, #16213e 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+    opacity: 0.3;
+}
+
+/* Sprite base class */
+.sprite {
+    background-image: url('img/sheet.svg');
+    background-size: 2400%;
+    background-repeat: no-repeat;
+}
+
+/* Local player */
+#player {
+    position: absolute;
+    width: 48px;
+    height: 64px;
+    left: 400px;
+    top: 300px;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    /* Default standing frame (frame 7, row 3/down) */
+    background-position: 30.43% 100%;
+}
+
+/* Container for other players */
+#other-players {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Other players' sprites */
+.other-player {
+    position: absolute;
+    width: 48px;
+    height: 64px;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) hue-rotate(180deg);
+}
+
+/* Fallback colored circle for players without sprite */
+.other-player:not(.sprite) {
+    width: 32px;
+    height: 32px;
+    background: #4ecdc4;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+}
+
+.player-label {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* UI Overlay */
+#ui-overlay {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 12px;
+    border-radius: 8px;
+    z-index: 100;
+    min-width: 150px;
+}
+
+.room-info {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #444;
+}
+
+.player-list {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.player-tag {
+    display: block;
+    background: #333;
+    padding: 4px 8px;
+    margin: 4px 0;
+    border-radius: 3px;
+}
+
+.player-tag.you {
+    background: #e94560;
+}
+
+.controls-hint {
+    font-size: 0.75em;
+    color: #888;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #444;
+}
+
+/* Chat Box */
+#chat-box {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    max-height: 300px;
+    background: rgba(20, 20, 30, 0.95);
+    border: 2px solid #4ecdc4;
+    border-radius: 10px;
+    z-index: 200;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#chat-box.active {
+    display: flex;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #4ecdc4;
+    color: #1a1a2e;
+    font-weight: bold;
+}
+
+.chat-header button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #1a1a2e;
+    line-height: 1;
+}
+
+.chat-header button:hover {
+    color: #e94560;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 10px 15px;
+    overflow-y: auto;
+    max-height: 180px;
+    min-height: 100px;
+}
+
+.chat-message {
+    margin: 5px 0;
+    padding: 5px 10px;
+    background: #2a2a3e;
+    border-radius: 5px;
+}
+
+.chat-message.mine {
+    background: #3a3a5e;
+    border-left: 3px solid #e94560;
+}
+
+.chat-message.theirs {
+    border-left: 3px solid #4ecdc4;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #444;
+}
+
+.chat-input input {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    background: #2a2a3e;
+    color: #fff;
+    font-size: 14px;
+}
+
+.chat-input input:focus {
+    outline: 2px solid #4ecdc4;
+}
+
+.chat-input button {
+    margin-left: 8px;
+    padding: 8px 16px;
+    background: #4ecdc4;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-input button:hover {
+    background: #3dbdb4;
+}
+
+/* Hide default Twine UI elements for game mode */
+#ui-bar {
+    display: none;
+}
+
+.passage {
+    max-width: none;
+    padding: 0;
+}

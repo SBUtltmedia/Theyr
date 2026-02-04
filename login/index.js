@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Default configuration
 const defaults = {
     port: 3000,
-    twinePath: 'Twine/index.html',
+    story: 'default',
     appID: 1
 };
 
@@ -30,13 +30,18 @@ try {
 }
 
 const PORT = process.env.PORT || configObj.serverconf?.port || defaults.port;
-const TWINE_PATH = process.env.TWINE_PATH || configObj.serverconf?.twinePath || defaults.twinePath;
+const STORY = process.env.STORY || configObj.serverconf?.story || defaults.story;
+const STORY_PATH = `./Twine/${STORY}`;
+const TWINE_PATH = process.env.TWINE_PATH || configObj.serverconf?.twinePath || `${STORY_PATH}/index.html`;
 const appID = process.env.appID || configObj.serverconf?.appID || defaults.appID;
+
+console.log(`[SERVER] Active story: ${STORY}`);
 
 const serverConf = {
 	port: PORT,
 	appIndex: appID,
 	twinePath: TWINE_PATH,
+	storyPath: STORY_PATH,
 	...configObj.serverconf
 };
 

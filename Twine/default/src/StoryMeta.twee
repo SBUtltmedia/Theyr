@@ -18,9 +18,9 @@ Lean Multiplayer Demo
  */
 
 // 1. Disable features that break multiplayer sync
-Config.saves.isAllowed = false;    // No local saves (state is server-side)
-Config.history.controls = false;   // No Back/Forward (actions are permanent)
-Config.history.maxStates = 1;      // Keep memory light
+Config.saves.isAllowed = () => false;  // Must be a function in SugarCube 2.37+
+Config.history.controls = false;       // No Back/Forward (actions are permanent)
+Config.history.maxStates = 1;          // Keep memory light
 
 // 2. Exception variables (Local only, never synced)
 window.exceptions = ['$userId', '$passageHistory'];

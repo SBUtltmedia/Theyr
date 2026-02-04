@@ -18,6 +18,12 @@ class Webstack {
 		this.serverConf = serverConf
 		this.port = serverConf.port;
 
+		// Serve story-specific assets at root (for relative paths in CSS/JS)
+		if (serverConf.storyPath) {
+			app.use("/", express.static(serverConf.storyPath));
+			console.log(`[SERVER] Serving story assets from: ${serverConf.storyPath}`);
+		}
+
 		app.use("/static", express.static('./static/'));
 		app.use("/Twine", express.static('./Twine/'));
 		app.use("/audio", express.static('./static/audio'));
