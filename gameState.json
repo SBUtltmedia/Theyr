@@ -1,1 +1,29 @@
-{}
+{
+    "users": {
+        "User_614": {
+            "name": "User_614"
+        },
+        "Player_Two": {
+            "name": "ShinyNewName"
+        },
+        "Playe3r": {
+            "name": "Playe3r"
+        },
+        "Player": {
+            "name": "Player"
+        }
+    },
+    "globalCounter": 1,
+    "chatMessages": [
+        {
+            "user": "Playe3r",
+            "text": "sfesdfa",
+            "time": 1770312915801
+        },
+        {
+            "user": "Playe3r",
+            "text": "dsfsd",
+            "time": 1770312919138
+        }
+    ]
+}

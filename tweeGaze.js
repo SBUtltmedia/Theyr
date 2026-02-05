@@ -39,14 +39,24 @@ gaze(watchPatterns, function (err, watcher) {
         if (mtime - coolDown > 1000) {
             coolDown = mtime
 
-            // Pass story name to build script
-            const command = `npm run build -- ${storyName}`;
+            // Detect which story to build based on the filepath
+            // Example: Twine/demo/src/Start.twee -> demo
+            const relativePath = path.relative(process.cwd(), filepath);
+            const pathParts = relativePath.split(path.sep);
+            let storyName = 'default';
+            
+            if (pathParts[0] === 'Twine' && pathParts[1] && pathParts[1] !== 'modules' && pathParts[1] !== 'src') {
+                storyName = pathParts[1];
+            }
 
-            exec(command, (err, stdout, stderr) => {
+            console.log(`[GAZE] Change detected in ${storyName}. Building...`);
+            const command = `node build-twine.js ${storyName}`;
+
+            exec(command, (err, stdout, stderr) => { 
                 if (err) {
-                    console.error("[GAZE] Build Error:", err)
+                    console.error(`[GAZE] Build Error (${storyName}):`, err)
                 } else {
-                    console.log(`[GAZE] Built: ${storyPath}/index.html`);
+                    console.log(`[GAZE] Built: Twine/${storyName}/index.html`);
                 }
             });
         }

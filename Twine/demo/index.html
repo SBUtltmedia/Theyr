@@ -523,47 +523,51 @@ console.log('ClientDemo.js loaded');
         }
     });
 })();
-</script><tw-passagedata pid="1" name="ChatRoom" tags="" position="225,100" size="100,100">&lt;&lt;liveblock&gt;&gt;
+</script><tw-passagedata pid="1" name="ChatRoom" tags="" position="225,100" size="100,100">&lt;&lt;set _chatInput to &quot;&quot;&gt;&gt;
+&lt;&lt;liveblock&gt;&gt;
 &lt;h2&gt;💬 Multiplayer Chat &amp; Counter&lt;/h2&gt;
 
 &lt;div style=&quot;border: 2px solid #ccc; padding: 10px; margin-bottom: 20px;&quot;&gt;
-    &lt;h3&gt;Shared Counter: &lt;span style=&quot;color: cyan;&quot;&gt;&lt;&lt;print $globalCounter&gt;&gt;&lt;/span&gt;&lt;/h3&gt;
+    &lt;h3&gt;Shared Counter: &lt;span id=&quot;shared-counter&quot; style=&quot;color: cyan;&quot;&gt;&lt;&lt;print $globalCounter&gt;&gt;&lt;/span&gt;&lt;/h3&gt;
     &lt;&lt;button &quot;Increment Counter&quot;&gt;&gt;
         &lt;&lt;th-set &#39;$globalCounter&#39; += 1&gt;&gt;
     &lt;&lt;/button&gt;&gt;
 &lt;/div&gt;
 
-&lt;div style=&quot;border: 1px solid #555; height: 200px; overflow-y: scroll; padding: 10px; background: #222;&quot;&gt;
-    &lt;&lt;if !def $chatMessages || $chatMessages.length === 0&gt;&gt;
+&lt;div id=&quot;chat-output&quot; style=&quot;border: 1px solid #555; height: 200px; overflow-y: scroll; padding: 10px; background: #222;&quot;&gt;
+    &lt;&lt;if ($chatMessages || []).length === 0&gt;&gt;
         &lt;p&gt;&lt;i&gt;No messages yet. Say hello!&lt;/i&gt;&lt;/p&gt;
     &lt;&lt;else&gt;&gt;
-        &lt;&lt;for _msg range $chatMessages&gt;&gt;
-            &lt;div&gt;
-                &lt;small&gt;[&lt;&lt;print new Date(_msg.time).toLocaleTimeString()&gt;&gt;]&lt;/small&gt; 
-                &lt;b&gt;&lt;&lt;print _msg.user&gt;&gt;:&lt;/b&gt; &lt;&lt;print _msg.text&gt;&gt;
+        &lt;&lt;for _m range $chatMessages&gt;&gt;
+            &lt;div class=&quot;chat-msg&quot;&gt;
+                &lt;small&gt;[&lt;&lt;print new Date(_m.time).toLocaleTimeString()&gt;&gt;]&lt;/small&gt; 
+                &lt;b&gt;&lt;&lt;print _m.user&gt;&gt;:&lt;/b&gt; &lt;&lt;print _m.text&gt;&gt;
             &lt;/div&gt;
         &lt;&lt;/for&gt;&gt;
     &lt;&lt;/if&gt;&gt;
 &lt;/div&gt;
 
 &lt;div style=&quot;margin-top: 10px;&quot;&gt;
-    &lt;&lt;set _chatInput to &quot;&quot;&gt;&gt;
-    &lt;&lt;textbox &quot;_chatInput&quot; &quot;&quot;&gt;&gt; 
+    &lt;&lt;textbox &quot;_chatInput&quot; _chatInput&gt;&gt; 
     &lt;&lt;button &quot;Send&quot;&gt;&gt;
-        &lt;&lt;if _chatInput.trim() !== &quot;&quot;&gt;&gt;
-            &lt;&lt;run 
-                const msg = {
-                    user: State.variables.userId,
-                    text: State.variables._chatInput.trim(),
-                    time: Date.now()
-                };
-                State.variables.chatMessages.push(msg);
-                // Keep only last 20 messages
-                if (State.variables.chatMessages.length &gt; 20) {
-                    State.variables.chatMessages.shift();
-                }
-            &gt;&gt;
+        &lt;&lt;if (_chatInput || &quot;&quot;).trim() !== &quot;&quot;&gt;&gt;
+            /* 1. Create message locally (_msg) */
+            &lt;&lt;set _msg = {
+                user: $userId,
+                text: _chatInput.trim(),
+                time: Date.now()
+            }&gt;&gt;
+            
+            /* 2. Update shared array ($chatMessages) */
+            &lt;&lt;run $chatMessages.push(State.temporary.msg)&gt;&gt;
+            &lt;&lt;if $chatMessages.length &gt; 20&gt;&gt;
+                &lt;&lt;run $chatMessages.shift()&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+            
+            /* 3. Broadcast shared array to server */
             &lt;&lt;th-set $chatMessages to $chatMessages&gt;&gt;
+            
+            /* 4. Reset local input (_chatInput) */
             &lt;&lt;set _chatInput to &quot;&quot;&gt;&gt;
             &lt;&lt;update&gt;&gt;
         &lt;&lt;/if&gt;&gt;
@@ -591,10 +595,19 @@ console.log('ClientDemo.js loaded');
         if (!State.variables.users) State.variables.users = {};
         State.variables.users[State.variables.userId] = userEntry;
         
-        // Update server
-        if (window.sendStateUpdate) {
-            window.sendStateUpdate(`$users[&quot;${State.variables.userId}&quot;]`, userEntry);
-        }
+        // Update server - Retry until connected
+        const registerInterval = setInterval(() =&gt; {
+            if (window.socket &amp;&amp; window.socket.connected &amp;&amp; window.sendStateUpdate) {
+                console.log(&quot;[THEYR] Socket connected. Sending registration.&quot;);
+                window.sendStateUpdate(`$users[&quot;${State.variables.userId}&quot;]`, userEntry);
+                clearInterval(registerInterval);
+            } else {
+                console.log(&quot;[THEYR] Waiting for socket connection...&quot;);
+            }
+        }, 500);
+        
+        // Safety timeout to stop checking after 10 seconds
+        setTimeout(() =&gt; clearInterval(registerInterval), 10000);
     }
 &lt;&lt;/script&gt;&gt;
 
@@ -636,9 +649,9 @@ console.log('ClientDemo.js loaded');
             &lt;&lt;/button&gt;&gt;
         &lt;/div&gt;
     &lt;&lt;/if&gt;&gt;
-&lt;&lt;/liveblock&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="StoryInit" tags="" position="350,100" size="100,100">&lt;&lt;set $users to {}&gt;&gt;
-&lt;&lt;set $chatMessages to []&gt;&gt;
-&lt;&lt;set $globalCounter to 0&gt;&gt;
+&lt;&lt;/liveblock&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="StoryInit" tags="" position="350,100" size="100,100">&lt;&lt;if ndef $users&gt;&gt;&lt;&lt;set $users to {}&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;if ndef $chatMessages&gt;&gt;&lt;&lt;set $chatMessages to []&gt;&gt;&lt;&lt;/if&gt;&gt;
+&lt;&lt;if ndef $globalCounter&gt;&gt;&lt;&lt;set $globalCounter to 0&gt;&gt;&lt;&lt;/if&gt;&gt;
 
 &lt;&lt;if window.userData &amp;&amp; window.userData.authData&gt;&gt;
     &lt;&lt;set $userId to window.userData.authData.username&gt;&gt;

@@ -1,0 +1,42 @@
+:: StoryTitle
+Lean Multiplayer Demo
+
+
+:: StoryData
+{
+	"ifid": "D674C58C-DEFA-4F70-B7A2-27742230C0A5",
+	"format": "SugarCube",
+	"format-version": "2.37.0-alpha.5",
+	"start": "Start",
+	"zoom": 1
+}
+
+
+:: Story JavaScript [script]
+/*
+ * Theyr Multiplayer Configuration
+ */
+
+// 1. Disable features that break multiplayer sync
+Config.saves.isAllowed = () => false;  // Must be a function in SugarCube 2.37+
+Config.history.controls = false;       // No Back/Forward (actions are permanent)
+Config.history.maxStates = 1;          // Keep memory light
+
+// 2. Exception variables (Local only, never synced)
+window.exceptions = ['$userId', '$passageHistory'];
+setup.exceptions = window.exceptions;
+
+// 3. Load Socket.IO and Initialize Client
+(function() {
+    const socketScript = document.createElement('script');
+    socketScript.src = '/socket.io/socket.io.js';
+    socketScript.onload = function() {
+        console.log('Socket.IO loaded');
+        if (window.initMultiplayerClient) {
+            window.initMultiplayerClient();
+        } else {
+            console.error("ClientDemo.js not loaded or initMultiplayerClient not defined.");
+        }
+    };
+    document.head.appendChild(socketScript);
+})();

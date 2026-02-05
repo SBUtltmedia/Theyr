@@ -22,7 +22,7 @@ test.describe('Multiplayer Visual Demo', () => {
     console.log("User 1 joining...");
     await page1.goto('/');
     await page1.fill('#name', 'Player_One');
-    await page1.click('button:has-text("Enter Story")');
+    await page1.click('button:has-text("Enter Story")', { noWaitAfter: true });
     await page1.waitForSelector('#passages');
     await page1.waitForTimeout(1000); // Slight pause to observe
 
@@ -30,7 +30,7 @@ test.describe('Multiplayer Visual Demo', () => {
     console.log("User 2 joining...");
     await page2.goto('/');
     await page2.fill('#name', 'Player_Two');
-    await page2.click('button:has-text("Enter Story")');
+    await page2.click('button:has-text("Enter Story")', { noWaitAfter: true });
     await page2.waitForSelector('#passages');
     await page2.waitForTimeout(2000); // Pause to see both on screen
 
@@ -43,17 +43,29 @@ test.describe('Multiplayer Visual Demo', () => {
 
     // 4. Demonstrate Sync
     console.log("Player One increments the counter...");
-    const counterBefore = await page2.locator('span[style*="color: cyan"]').textContent();
+    const counterBefore = await page2.locator('#shared-counter').textContent();
     
     // Perform increment on Page 1
     await page1.click('button:has-text("Increment Counter")');
     
     // Verify Page 2 updates automatically
-    await expect(page2.locator('span[style*="color: cyan"]')).not.toHaveText(counterBefore || "");
-    console.log("✓ Player Two saw the update instantly!");
-    await page1.waitForTimeout(2000); // Observe the counter sync
+    await expect(page2.locator('#shared-counter')).not.toHaveText(counterBefore || "");
+    console.log("✓ Player Two saw the counter update!");
+    await page1.waitForTimeout(1000);
 
-    // 5. Demonstrate Name Change Sync
+    // 5. Demonstrate Chat Sync
+    console.log("Player One sends a chat message...");
+    const testMessage = `Hello from Player One at ${Date.now()}`;
+    await page1.fill('input[type="text"]', testMessage);
+    await page1.click('button:has-text("Send")');
+    
+    console.log("Waiting for Player Two to receive the message...");
+    await expect(page2.locator('#chat-output')).toContainText('Player_One:');
+    await expect(page2.locator('#chat-output')).toContainText(testMessage);
+    console.log("✓ Player Two received the chat message!");
+    await page1.waitForTimeout(2000);
+
+    // 6. Demonstrate Name Change Sync
     console.log("Player Two changes their name...");
     await page2.click('a:has-text("Back to Start")'); 
     await page2.waitForTimeout(1000);

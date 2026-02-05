@@ -1,0 +1,76 @@
+:: Start {"position":"100,100","size":"100,100"}
+<<script>>
+    // 1. Identify the user (Private/Local only)
+    if (window.userData && window.userData.authData) {
+        State.variables.userId = window.userData.authData.username;
+    } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        State.variables.userId = urlParams.get('nick') || "User_" + Math.floor(Math.random() * 1000);
+    }
+
+    // 2. Shared Registration: Only run this ONCE when entering the passage
+    // We check if the user is already in the list to avoid redundant updates
+    if (!State.variables.users || !State.variables.users[State.variables.userId]) {
+        console.log("[THEYR] Registering user in shared state...");
+        // Use the JS API directly to avoid macro re-render loops
+        const userEntry = { name: State.variables.userId };
+        
+        // Update locally
+        if (!State.variables.users) State.variables.users = {};
+        State.variables.users[State.variables.userId] = userEntry;
+        
+        // Update server - Retry until connected
+        const registerInterval = setInterval(() => {
+            if (window.socket && window.socket.connected && window.sendStateUpdate) {
+                console.log("[THEYR] Socket connected. Sending registration.");
+                window.sendStateUpdate(`$users["${State.variables.userId}"]`, userEntry);
+                clearInterval(registerInterval);
+            } else {
+                console.log("[THEYR] Waiting for socket connection...");
+            }
+        }, 500);
+        
+        // Safety timeout to stop checking after 10 seconds
+        setTimeout(() => clearInterval(registerInterval), 10000);
+    }
+<</script>>
+
+<<liveblock>>
+    <h1>🚀 Theyr Modular Demo</h1>
+
+    <<set _currentName to ($users && $users[$userId] ? $users[$userId].name : $userId)>>
+    Welcome, **_currentName**! (ID: $userId)
+
+    <div style="background: #333; padding: 15px; border-radius: 5px; margin: 15px 0;">
+        <h3>Set Your Public Name:</h3>
+        <<set _draftName to _currentName>>
+        <<textbox "_draftName" _draftName>> 
+        <<button "Confirm Name">>
+            <<th-set $users[$userId].name to _draftName>>
+        <</button>>
+    </div>
+
+    <div style="margin: 20px 0; border: 1px solid #444; padding: 10px;">
+        <h3>Who else is here?</h3>
+        <ul>
+        <<for _id, _data range $users>>
+            <li>
+                <strong><<print _data.name || _id>></strong> 
+                <<if _id === $userId>> (You) <</if>>
+            </li>
+        <</for>>
+        </ul>
+    </div>
+
+    [[Enter the Chat Room|ChatRoom]]
+
+    /* Debug/Testing tools for Authors */
+    <<if window.userData && window.userData.authData && window.userData.authData.roles.includes('admin')>>
+        <div style="margin-top: 50px; border-top: 1px dashed #666; padding-top: 10px; font-size: 0.8em; opacity: 0.7;">
+            <b>Author Tools:</b> 
+            <<button "Reset Shared Server State">>
+                <<run window.socket.emit('fullReset')>>
+            <</button>>
+        </div>
+    <</if>>
+<</liveblock>>

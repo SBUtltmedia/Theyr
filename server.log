@@ -1,4 +1,19 @@
+
+> Theyr@1.0.0 start
+> node login/index.js
+
+[SERVER] Active story: demo
+[DEBUG] SERVER STARTING...
+[SERVER] Serving story assets from: ./Twine/demo
 [SERVER] Loading persistent state from ./gameState.json
+[DM-MODE] Watching ./gameState.json for live edits...
 App listening at http://localhost:3000
+[GAZE] Watching story: demo
+[GAZE] Watch patterns: [ 'Twine/demo/**/*.*', 'Twine/modules/**/*.*' ]
+[DEV] Twine file watcher (Gaze) active.
 [GAZE] Performing initial build...
-[GAZE] Built: Twine/index.html
+[GAZE] Built: Twine/demo/index.html
+SERVER RECEIVES NEW USER: User_614
+[SERVER] Shutting down (SIGTERM)...
+[SERVER] Saving state to ./gameState.json...
+[SERVER] State saved successfully.

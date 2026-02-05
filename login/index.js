@@ -14,7 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 // Default configuration
 const defaults = {
     port: 3000,
-    story: 'default',
+    story: 'demo',
     appID: 1
 };
 
@@ -45,16 +45,16 @@ const serverConf = {
 	...configObj.serverconf
 };
 
+
 const webstackInstance = new webstack(serverConf);
 const { app } = webstackInstance.get();
 const htmlTemplate = 'login/index.html';
 
 // Handle Mock Login and Story Delivery
 app.get('/', async ({ query }, response) => {
-	const userData = query;
+        const userData = query;
 
-	if (userData.nick) {
-		// Mimic a full Discord OAuth data structure for easy transition later
+        if (userData.nick) {		// Mimic a full Discord OAuth data structure for easy transition later
 		const authData = {
 			id: userData.id || Date.now().toString(),
 			username: userData.nick,

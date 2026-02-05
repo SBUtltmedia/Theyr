@@ -1,0 +1,54 @@
+:: ChatRoom {"position":"225,100","size":"100,100"}
+<<set _chatInput to "">>
+<<liveblock>>
+<h2>💬 Multiplayer Chat & Counter</h2>
+
+<div style="border: 2px solid #ccc; padding: 10px; margin-bottom: 20px;">
+    <h3>Shared Counter: <span id="shared-counter" style="color: cyan;"><<print $globalCounter>></span></h3>
+    <<button "Increment Counter">>
+        <<th-set '$globalCounter' += 1>>
+    <</button>>
+</div>
+
+<div id="chat-output" style="border: 1px solid #555; height: 200px; overflow-y: scroll; padding: 10px; background: #222;">
+    <<if ($chatMessages || []).length === 0>>
+        <p><i>No messages yet. Say hello!</i></p>
+    <<else>>
+        <<for _m range $chatMessages>>
+            <div class="chat-msg">
+                <small>[<<print new Date(_m.time).toLocaleTimeString()>>]</small> 
+                <b><<print _m.user>>:</b> <<print _m.text>>
+            </div>
+        <</for>>
+    <</if>>
+</div>
+
+<div style="margin-top: 10px;">
+    <<textbox "_chatInput" _chatInput>> 
+    <<button "Send">>
+        <<if (_chatInput || "").trim() !== "">>
+            /* 1. Create message locally (_msg) */
+            <<set _msg = {
+                user: $userId,
+                text: _chatInput.trim(),
+                time: Date.now()
+            }>>
+            
+            /* 2. Update shared array ($chatMessages) */
+            <<run $chatMessages.push(State.temporary.msg)>>
+            <<if $chatMessages.length > 20>>
+                <<run $chatMessages.shift()>>
+            <</if>>
+            
+            /* 3. Broadcast shared array to server */
+            <<th-set $chatMessages to $chatMessages>>
+            
+            /* 4. Reset local input (_chatInput) */
+            <<set _chatInput to "">>
+            <<update>>
+        <</if>>
+    <</button>>
+</div>
+ 
+[[Back to Start|Start]]
+<</liveblock>>

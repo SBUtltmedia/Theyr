@@ -126,6 +126,12 @@ function updateSugarCubeState(new_state) {
     // Use jQuery's deep extend to replicate lodash's merge without the dependency
     $.extend(true, window.SugarCube.State.variables, filteredState);
 
+    // Also call State.setVar for each top-level key to ensure SugarCube reactivity
+    for (const key in filteredState) {
+        const varPath = '$' + key;
+        window.SugarCube.State.setVar(varPath, window.SugarCube.State.variables[key]);
+    }
+
     // Trigger liveupdate for any <<liveblock>> sections
     $(document).trigger(":liveupdate");
     $(document).trigger(":liveupdateinternal");

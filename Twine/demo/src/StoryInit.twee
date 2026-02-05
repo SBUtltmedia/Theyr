@@ -1,0 +1,8 @@
+:: StoryInit
+<<if ndef $users>><<set $users to {}>><</if>>
+<<if ndef $chatMessages>><<set $chatMessages to []>><</if>>
+<<if ndef $globalCounter>><<set $globalCounter to 0>><</if>>
+
+<<if window.userData && window.userData.authData>>
+    <<set $userId to window.userData.authData.username>>
+<</if>>
